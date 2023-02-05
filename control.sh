@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 if [ "$1" = "init" ]; then
 
     if [ -f "/tmp/minitwit.db" ]; then 
@@ -9,7 +9,8 @@ if [ "$1" = "init" ]; then
     python -c"from minitwit import init_db;init_db()"
 elif [ "$1" = "start" ]; then
     echo "Starting minitwit..."
-    nohup "$(command -v python)" minitwit.py > /tmp/out.log 2>&1 &
+    nohup "$(which python)" minitwit.py > /tmp/out.log 2>&1 &
+
 elif [ "$1" = "stop" ]; then
     echo "Stopping minitwit..."
     pkill -f minitwit
