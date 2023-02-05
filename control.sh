@@ -10,6 +10,7 @@ if [ "$1" = "init" ]; then
 elif [ "$1" = "start" ]; then
     echo "Starting minitwit..."
     nohup "$(which python)" minitwit.py > /tmp/out.log 2>&1 &
+
 elif [ "$1" = "stop" ]; then
     echo "Stopping minitwit..."
     pkill -f minitwit
