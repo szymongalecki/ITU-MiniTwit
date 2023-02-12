@@ -1,9 +1,14 @@
 from django.shortcuts import render
-from .models import Message, User
+from .models import Message, User, Follower
 
 def timeline(request):
-    messages = Message.objects.filter()
-    user = User.objects.get(id=request.user.id)
+    if request.user.is_authenticated:
+        user = User.objects.get(id=request.user.id)
+        follower = Follower.objects.filter(who_id = user.id).values_list('whom_id')
+        messages = Message.objects.filter(author_id__in = follower)
+    else:
+        user = None
+        messages = Message.objects.get()
     context = {
         "messages":messages,
         "user":user
