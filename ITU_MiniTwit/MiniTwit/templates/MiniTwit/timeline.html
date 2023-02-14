@@ -23,7 +23,7 @@
         <a class="follow" href="{% url 'MiniTwit:follow-user' profile_user.username %}">Follow user</a>.
       {% endif %}
       </div>
-    {% elif view == 'user_timeline' %}
+    {% else %}
       <div class=twitbox>
         <h3>What's on your mind {{ g.user.username }}?</h3>
         <form action="{% url 'MiniTwit:add-message' %}" method=post>
@@ -37,7 +37,7 @@
   {% if messages %}
   {% for message in messages %}
     <li><img src="{{ message.email }}"><p>
-      <strong><a href="{% url 'MiniTwit:user-timeline' message.author_id %}">{{ message.author_id }}</a></strong>
+      <strong><a href="{% url 'MiniTwit:user-profile-timeline' message.author_id %}">{{ message.author_id }}</a></strong>
       {{ message.text }}
       <small>&mdash; {{ message.pub_date }}</small>
   {% endfor %}
