@@ -1,6 +1,7 @@
 import time
 from django.shortcuts import render
 from .models import Message, User, Follower
+from werkzeug.security import check_password_hash, generate_password_hash
 
 def timeline(request):
     if request.user.is_authenticated:
@@ -76,3 +77,31 @@ def add_message(request, pk):
     message = Message(author_id = user.id, text = request.form['text'], pub_date = int(time.time()))
     message.save()
     return timeline(request)
+
+def get_user_id(userName):
+    user = User.objects.get(username = userName)
+    return user if user else None
+
+def register(request):
+    #if request.user:
+        #return timeline(request)
+    error = None
+    if request.method == 'POST':
+        if not request.form['username']:
+            error = 'You have to enter a username'
+        elif not request.form['email'] or \
+                 '@' not in request.form['email']:
+            error = 'You have to enter a valid email address'
+        elif not request.form['password']:
+            error = 'You have to enter a password'
+        elif request.form['password'] != request.form['password2']:
+            error = 'The two passwords do not match'
+        elif get_user_id(request.form['username']) is not None:
+            error = 'The username is already taken'
+        else:
+            #newUser = User(username = request.form['username'], email = request.form['email'], password = generate_password_hash(request.form['password']))
+            print('user created')
+            #newUser.save()
+            #flash('You were successfully registered and can login now')
+            return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'MiniTwit/register.html', {error:error})

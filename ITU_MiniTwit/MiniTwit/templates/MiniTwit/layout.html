@@ -9,7 +9,7 @@
     <a href="{% url 'MiniTwit:logout' %}">sign out {{ user.username }}</a>
   {% else %}
     <a href="{% url 'MiniTwit:public-timeline' %}">public timeline</a> |
-    <a href="{% url 'MiniTwit:public-timeline' %}">sign up</a> |
+    <a href="{% url 'MiniTwit:register' %}">sign up</a> |
     <a href="{% url 'MiniTwit:login' %}">sign in</a>
   {% endif %}
   </div>
