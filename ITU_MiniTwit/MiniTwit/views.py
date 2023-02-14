@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import render
 from .models import Message, User, Follower
 
@@ -70,5 +71,8 @@ def unfollow_user(request, pk):
     Follower.objects.filter(who_id = user.id, whom_id = profile_user.id).delete()
     return user_profile_timeline(request, profile_user.username)
 
-def add_message(request):
-    return render(request, 'MiniTwit/login.html', {})
+def add_message(request, pk):
+    user = User.objects.get(username=pk)
+    message = Message(author_id = user.id, text = request.form['text'], pub_date = int(time.time()))
+    message.save()
+    return timeline(request)
