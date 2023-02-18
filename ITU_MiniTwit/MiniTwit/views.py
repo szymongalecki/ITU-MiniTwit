@@ -52,10 +52,10 @@ def user_profile_timeline(request, pk):
     return render(request, 'MiniTwit/timeline.html', context)
 
 def login(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
 
 def logout(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
 
 def follow_user(request, pk):
     user = User.objects.get(id=request.user.id)
@@ -71,4 +71,4 @@ def unfollow_user(request, pk):
     return user_profile_timeline(request, profile_user.username)
 
 def add_message(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
