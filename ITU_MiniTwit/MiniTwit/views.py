@@ -1,4 +1,9 @@
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+from django.views import generic
+
+from .forms import CustomUserCreationForm
 from .models import Message, User, Follower
 
 def timeline(request):
@@ -52,10 +57,10 @@ def user_profile_timeline(request, pk):
     return render(request, 'MiniTwit/timeline.html', context)
 
 def login(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
 
 def logout(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
 
 def follow_user(request, pk):
     user = User.objects.get(id=request.user.id)
@@ -71,4 +76,9 @@ def unfollow_user(request, pk):
     return user_profile_timeline(request, profile_user.username)
 
 def add_message(request):
-    return render(request, 'MiniTwit/login.html', {})
+    return render(request, 'registration/login.html', {})
+
+class SignUpView(generic.CreateView):
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy("MiniTwit:login")
+    template_name = "registration/signup.html"
