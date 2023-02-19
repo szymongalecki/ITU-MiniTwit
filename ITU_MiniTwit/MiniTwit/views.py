@@ -72,9 +72,9 @@ def unfollow_user(request, pk):
     Follower.objects.filter(who_id = user.id, whom_id = profile_user.id).delete()
     return user_profile_timeline(request, profile_user.username)
 
-def add_message(request, pk):
-    user = User.objects.get(username=pk)
-    message = Message(author_id = user.id, text = request.form['text'], pub_date = int(time.time()))
+def add_message(request):
+    user = User.objects.get(id=request.user.id)
+    message = Message(author_id = user, text = request.POST.get('text',''), pub_date = int(time.time()))
     message.save()
     return timeline(request)
 
