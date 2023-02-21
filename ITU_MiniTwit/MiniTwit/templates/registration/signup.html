@@ -1,6 +1,8 @@
+{% extends "MiniTwit/layout.html" %}
+
 {% block title %}Sign Up{% endblock %}
 
-{% block content %}
+{% block body %}
   <h2>Sign up</h2>
   <form method="post">
     {% csrf_token %}
