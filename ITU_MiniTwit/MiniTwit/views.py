@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
@@ -5,6 +6,7 @@ from django.views import generic
 
 from .forms import CustomUserCreationForm
 from .models import Message, User, Follower
+from werkzeug.security import check_password_hash, generate_password_hash
 
 def timeline(request):
     if request.user.is_authenticated:
@@ -76,7 +78,10 @@ def unfollow_user(request, pk):
     return user_profile_timeline(request, profile_user.username)
 
 def add_message(request):
-    return render(request, 'registration/login.html', {})
+    user = User.objects.get(id=request.user.id)
+    message = Message(author_id = user, text = request.POST.get('text',''), pub_date = int(time.time()))
+    message.save()
+    return timeline(request)
 
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
