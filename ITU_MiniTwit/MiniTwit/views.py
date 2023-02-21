@@ -12,7 +12,7 @@ def timeline(request):
     if request.user.is_authenticated:
         user = User.objects.get(id=request.user.id)
         follower = Follower.objects.filter(who_id = user.id).values_list('whom_id')
-        messages = Message.objects.filter(author_id__in = follower)
+        messages = Message.objects.filter(author_id__in = follower).order_by('-pub_date')
         view = "timeline"
     else:
         return public_timeline(request)
@@ -28,7 +28,7 @@ def public_timeline(request):
         user = User.objects.get(id=request.user.id)
     else:
         user = None
-    messages = Message.objects.all()
+    messages = Message.objects.all().order_by('-pub_date')
     view = "public_timeline"
     context = {
         "view":view,
