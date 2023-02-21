@@ -1,5 +1,9 @@
+{% load static %}
 <!doctype html>
 <title>{% block title %}Welcome{% endblock %} | MiniTwit</title>
+<head>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
 <div class=page>
   <h1>MiniTwit</h1>
   <div class="navigation">

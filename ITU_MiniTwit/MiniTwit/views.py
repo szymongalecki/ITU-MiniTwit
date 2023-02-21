@@ -1,12 +1,10 @@
 import time
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.contrib.auth.forms import UserCreationForm
 from django.views import generic
 
 from .forms import CustomUserCreationForm
 from .models import Message, User, Follower
-from werkzeug.security import check_password_hash, generate_password_hash
 
 def timeline(request):
     if request.user.is_authenticated:
