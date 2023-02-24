@@ -7,6 +7,8 @@ import sqlite3
 2. Find the equivalent of 'before_request' and 'after_request' - https://fastapi.tiangolo.com/tutorial/middleware/
 3. How to map the response to JSON from plain list of values, is it necessary?
 4. Investigate more the provided API
+5. What is represented by LATEST?
+6. How to authenticate minitwit_sim_api_test.py?
 """
 
 app = FastAPI()
@@ -36,9 +38,12 @@ def execute_query(query, parameters):
     finally:
         return response
 
-def JSON(response, fields):
-    """Creates JSON response with given fields"""
-    return [dict(zip(fields, r)) for r in response]
+def flatten(response):
+    try: 
+        flat = [item for r in response for item in r]
+    except Exception as e:
+        return []
+    return flat
 
 def single_value(response):
     """Returns single value from nonempty collection, otherwise None"""
@@ -56,11 +61,11 @@ def get_user_id(username: str):
             """
     parameters = (username, )
     response = execute_query(query, parameters)
-    return single_value(response)
-
-@app.get("/", response_class=PlainTextResponse)
-def default():
-    return "HELLO FROM THE API\nAT LEAST, I CAN SAY THAT I'VE TRIED"
+    user_id = single_value(response)
+    if user_id is None:
+        raise HTTPException(status_code=404, detail="username not found")
+    else:
+        return user_id
 
 @app.get("/msgs")
 def get_messages():
@@ -75,17 +80,14 @@ def get_messages():
     parameters = (LIMIT, )
     response = execute_query(query, parameters)
     if response is not None:
-        return JSON(response, ["content", "pub_date", "user"])
+        return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
-
 
 @app.get("/msgs/{username}")
 def get_user_messages(username: str):
     """Returns the latest messages of given user"""
     user_id = get_user_id(username)
-    if user_id is None:
-        raise HTTPException(status_code=404, detail="username not found")
     query = """
             SELECT message.text, message.pub_date, user.username 
             FROM message, user 
@@ -96,7 +98,24 @@ def get_user_messages(username: str):
     parameters = (user_id, LIMIT)
     response = execute_query(query, parameters)
     if response is not None:
-        return JSON(response, ["content", "pub_date", "user"])
+        return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
+
+@app.get("/fllws/{username}")
+def get_followers(username: str):
+    """Returns followers of given user"""
+    user_id = get_user_id(username)
+    query = """
+            SELECT user.username FROM user
+            INNER JOIN follower ON follower.whom_id=user.user_id
+            WHERE follower.who_id=?
+            LIMIT ?
+            """
+    parameters = (user_id, LIMIT)
+    response = execute_query(query, parameters)
+    if response is None:
+        return {"follows": []}
+    else:
+        return {"follows": [follower for r in response for follower in r]}
 
