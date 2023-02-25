@@ -25,6 +25,6 @@ Vagrant.configure("2") do |config|
       pip install django
       git clone https://github.com/szymongalecki/ITU-MiniTwit.git
       cd ITU-MiniTwit/ITU_MiniTwit
-      python3 manager.py runserver
+      python3 manage.py runserver
     SHELL
 end
