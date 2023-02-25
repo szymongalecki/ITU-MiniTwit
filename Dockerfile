@@ -12,10 +12,13 @@ COPY ./requirements.txt /usr/src
 
 RUN pip install -r requirements.txt
 
-COPY . /usr/src
+COPY ./ITU_MiniTwit /usr/src
 
 # Make port 8080 available to the host
-EXPOSE 8080
+EXPOSE 8000
+
+RUN python manage.py migrate
 
 # Build and run the server when the container is started
-CMD ["python", "minitwit.py"]
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=ITU_MiniTwit.settings python manage.py runserver 0.0.0.0:8000"]
+
