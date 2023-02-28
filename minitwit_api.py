@@ -146,7 +146,7 @@ def get_messages(latest: int, no: int = LIMIT):
         return []
 
 
-@app.get("/msgs/{username}")
+@app.get("/msgs/{username}", status_code=204)
 def get_user_messages(username: str, latest: int, no: int = LIMIT):
     """Returns the latest messages of given user"""
     update_latest(latest)
@@ -195,9 +195,15 @@ POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST 
 @app.post("/register", status_code=204)
 def post_register_user(latest: int, user: User):
     """Registers new user with provided data"""
+    print(f"{latest=}")
     update_latest(latest)
-    if get_user_id(user.username) is not None:
+    try:
+        get_user_id(user.username)
+    except HTTPException as user_does_not_exist:
+        pass
+    else:
         raise HTTPException(status_code=400, detail="The username is already taken")
+
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
