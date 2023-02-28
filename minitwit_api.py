@@ -1,22 +1,12 @@
 from contextlib import closing
 import os
 import time
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI, HTTPException
 import sqlite3
 from pydantic import BaseModel
-from typing import Dict, Tuple, List
+from typing import Tuple
+import uvicorn
 from werkzeug.security import generate_password_hash
-
-
-"""
-1. API uses the same database as minitwit.py
-2. Find the equivalent of 'before_request' and 'after_request' - https://fastapi.tiangolo.com/tutorial/middleware/
-3. How to map the response to JSON from plain list of values, is it necessary?
-4. Investigate more the provided API
-5. What is represented by LATEST?
-6. How to authenticate minitwit_sim_api_test.py?
-"""
 
 
 """
@@ -90,14 +80,6 @@ def execute_query(query: str, parameters: Tuple):
         return response
 
 
-def single_value(response):
-    """Returns single value from nonempty collection, otherwise None"""
-    if response is None:
-        return None
-    else:
-        return response[0][0]
-
-
 def get_user_id(username: str):
     """Returns user_id if username exists in database."""
     query = """
@@ -107,7 +89,8 @@ def get_user_id(username: str):
             """
     parameters = (username,)
     response = execute_query(query, parameters)
-    user_id = single_value(response)
+    user_id = None if response is None else response[0][0]
+    # user_id = single_value(response)
     if user_id is None:
         raise HTTPException(status_code=404, detail="username not found")
     else:
@@ -146,7 +129,7 @@ def get_messages(latest: int, no: int = LIMIT):
         return []
 
 
-@app.get("/msgs/{username}", status_code=204)
+@app.get("/msgs/{username}", status_code=200)
 def get_user_messages(username: str, latest: int, no: int = LIMIT):
     """Returns the latest messages of given user"""
     update_latest(latest)
@@ -195,7 +178,6 @@ POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST 
 @app.post("/register", status_code=204)
 def post_register_user(latest: int, user: User):
     """Registers new user with provided data"""
-    print(f"{latest=}")
     update_latest(latest)
     try:
         get_user_id(user.username)
@@ -224,7 +206,6 @@ def post_user_messages(username: str, latest: int, message: Message):
             VALUES (?, ?, ?, 0)
             """
     parameters = (user_id, message.content, int(time.time()))
-    print(parameters)
     execute_query(query, parameters)
 
 
@@ -245,7 +226,7 @@ def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow):
                 DELETE FROM follower 
                 WHERE who_id=? and WHOM_ID=?
                 """
-    parameters = (user, follower)
+    parameters = (follower, user)
     execute_query(query, parameters)
 
 
@@ -255,3 +236,6 @@ EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY
 
 os.system(f"rm {DATABASE}")
 init_db()
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
