@@ -1,9 +1,12 @@
+from contextlib import closing
+import os
 import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 import sqlite3
 from pydantic import BaseModel
 from typing import Dict, Tuple, List
+from werkzeug.security import generate_password_hash
 
 
 """
@@ -15,10 +18,16 @@ from typing import Dict, Tuple, List
 6. How to authenticate minitwit_sim_api_test.py?
 """
 
+
+"""
+CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION 
+"""
+
 app = FastAPI()
 DATABASE = "./minitwit.db"
 LIMIT = 100
 LATEST = 0
+
 
 """
 DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS
@@ -35,19 +44,27 @@ class User(BaseModel):
     pwd: str
 
 
+class Follow_Unfollow(BaseModel):
+    follow: str | None = None
+    unfollow: str | None = None
+
+
 """
 HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS
 """
 
 
+def init_db():
+    """Creates the database tables."""
+    with closing(sqlite3.connect(DATABASE)) as db:
+        with open("schema.sql", "r") as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+
 def update_latest(latest: int):
     global LATEST
     LATEST = latest if latest != -1 else LATEST
-
-
-def connect_db():
-    """Returns a new connection to the database."""
-    return sqlite3.connect(DATABASE)
 
 
 def execute_query(query: str, parameters: Tuple):
@@ -151,7 +168,7 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT):
 
 
 @app.get("/fllws/{username}")
-def get_followers(username: str, latest: int, no: int = LIMIT):
+def get_user_followers(username: str, latest: int, no: int = LIMIT):
     """Returns followers of given user"""
     update_latest(latest)
     limit = no if no else LIMIT
@@ -175,9 +192,25 @@ POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST 
 """
 
 
-@app.post("/msgs/{username}", status_code=201)
-def post_user_message(username: str, latest: int, message: Message):
-    """Post message as given username"""
+@app.post("/register", status_code=204)
+def post_register_user(latest: int, user: User):
+    """Registers new user with provided data"""
+    update_latest(latest)
+    if get_user_id(user.username) is not None:
+        raise HTTPException(status_code=400, detail="The username is already taken")
+    if "@" not in user.email:
+        raise HTTPException(status_code=400, detail="Provided email has no @")
+    query = """
+            INSERT INTO user (username, email, pw_hash) 
+            VALUES (?, ?, ?)
+            """
+    parameters = (user.username, user.email, generate_password_hash(user.pwd))
+    execute_query(query, parameters)
+
+
+@app.post("/msgs/{username}", status_code=204)
+def post_user_messages(username: str, latest: int, message: Message):
+    """Posts message as given username"""
     update_latest(latest)
     user_id = get_user_id(username)
     query = """
@@ -187,4 +220,32 @@ def post_user_message(username: str, latest: int, message: Message):
     parameters = (user_id, message.content, int(time.time()))
     print(parameters)
     execute_query(query, parameters)
-    return True
+
+
+@app.post("/fllws/{username}", status_code=204)
+def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow):
+    """Follows or unfollows user"""
+    update_latest(latest)
+    follower = get_user_id(username)
+    if f_u.follow:
+        user = get_user_id(f_u.follow)
+        query = """ 
+                INSERT INTO follower (who_id, whom_id) 
+                VALUES (?, ?) 
+                """
+    else:
+        user = get_user_id(f_u.unfollow)
+        query = """
+                DELETE FROM follower 
+                WHERE who_id=? and WHOM_ID=?
+                """
+    parameters = (user, follower)
+    execute_query(query, parameters)
+
+
+"""
+EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY
+"""
+
+os.system(f"rm {DATABASE}")
+init_db()
