@@ -1,6 +1,10 @@
+import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 import sqlite3
+from pydantic import BaseModel
+from typing import Dict, Tuple, List
+
 
 """
 1. API uses the same database as minitwit.py
@@ -12,15 +16,42 @@ import sqlite3
 """
 
 app = FastAPI()
-DATABASE = './minitwit.db'
+DATABASE = "./minitwit.db"
 LIMIT = 100
+LATEST = 0
+
+"""
+DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS
+"""
+
+
+class Message(BaseModel):
+    content: str
+
+
+class User(BaseModel):
+    username: str
+    email: str
+    pwd: str
+
+
+"""
+HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS
+"""
+
+
+def update_latest(latest: int):
+    global LATEST
+    LATEST = latest if latest != -1 else LATEST
+
 
 def connect_db():
     """Returns a new connection to the database."""
     return sqlite3.connect(DATABASE)
 
-def execute_query(query, parameters):
-    """Executes query with provided parameters, fetches all results"""
+
+def execute_query(query: str, parameters: Tuple):
+    """Executes query with provided parameters, fetches all results, commits changes"""
     response = None
     try:
         connection = sqlite3.connect(DATABASE)
@@ -28,22 +59,19 @@ def execute_query(query, parameters):
             cursor = connection.cursor()
             response = cursor.execute(query, parameters).fetchall()
             cursor.close()
+            connection.commit()
             connection.close()
             if response == []:
                 response = None
         except Exception as e:
             print(f"FAILED TO EXECUTE QUERY: {e}")
     except Exception as e:
-        print(f"FAILED TO CONNECT TO DATABASE: {e}", )
+        print(
+            f"FAILED TO CONNECT TO DATABASE: {e}",
+        )
     finally:
         return response
 
-def flatten(response):
-    try: 
-        flat = [item for r in response for item in r]
-    except Exception as e:
-        return []
-    return flat
 
 def single_value(response):
     """Returns single value from nonempty collection, otherwise None"""
@@ -52,6 +80,7 @@ def single_value(response):
     else:
         return response[0][0]
 
+
 def get_user_id(username: str):
     """Returns user_id if username exists in database."""
     query = """
@@ -59,7 +88,7 @@ def get_user_id(username: str):
             FROM user 
             WHERE username = ?
             """
-    parameters = (username, )
+    parameters = (username,)
     response = execute_query(query, parameters)
     user_id = single_value(response)
     if user_id is None:
@@ -67,9 +96,24 @@ def get_user_id(username: str):
     else:
         return user_id
 
+
+"""
+GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET
+"""
+
+
+@app.get("/latest")
+def get_latest():
+    """Returns integer used by simulator to track requests"""
+    global LATEST
+    return {"latest": LATEST}
+
+
 @app.get("/msgs")
-def get_messages():
+def get_messages(latest: int, no: int = LIMIT):
     """Returns the latest messages"""
+    update_latest(latest)
+    limit = no if no else LIMIT
     query = """
             SELECT message.text, message.pub_date, user.username 
             FROM message, user 
@@ -77,16 +121,19 @@ def get_messages():
             user.user_id = message.author_id
             ORDER BY message.pub_date DESC LIMIT ?
             """
-    parameters = (LIMIT, )
+    parameters = (limit,)
     response = execute_query(query, parameters)
     if response is not None:
         return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
+
 @app.get("/msgs/{username}")
-def get_user_messages(username: str):
+def get_user_messages(username: str, latest: int, no: int = LIMIT):
     """Returns the latest messages of given user"""
+    update_latest(latest)
+    limit = no if no else LIMIT
     user_id = get_user_id(username)
     query = """
             SELECT message.text, message.pub_date, user.username 
@@ -95,16 +142,19 @@ def get_user_messages(username: str):
             user.user_id = message.author_id AND user.user_id = ?
             ORDER BY message.pub_date DESC LIMIT ?
             """
-    parameters = (user_id, LIMIT)
+    parameters = (user_id, limit)
     response = execute_query(query, parameters)
     if response is not None:
         return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
+
 @app.get("/fllws/{username}")
-def get_followers(username: str):
+def get_followers(username: str, latest: int, no: int = LIMIT):
     """Returns followers of given user"""
+    update_latest(latest)
+    limit = no if no else LIMIT
     user_id = get_user_id(username)
     query = """
             SELECT user.username FROM user
@@ -112,10 +162,29 @@ def get_followers(username: str):
             WHERE follower.who_id=?
             LIMIT ?
             """
-    parameters = (user_id, LIMIT)
+    parameters = (user_id, limit)
     response = execute_query(query, parameters)
     if response is None:
         return {"follows": []}
     else:
         return {"follows": [follower for r in response for follower in r]}
 
+
+"""
+POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST 
+"""
+
+
+@app.post("/msgs/{username}", status_code=201)
+def post_user_message(username: str, latest: int, message: Message):
+    """Post message as given username"""
+    update_latest(latest)
+    user_id = get_user_id(username)
+    query = """
+            INSERT INTO message (author_id, text, pub_date, flagged)
+            VALUES (?, ?, ?, 0)
+            """
+    parameters = (user_id, message.content, int(time.time()))
+    print(parameters)
+    execute_query(query, parameters)
+    return True
