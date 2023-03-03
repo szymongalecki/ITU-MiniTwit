@@ -130,3 +130,5 @@ AUTH_USER_MODEL = 'MiniTwit.User'
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" 
+
+CSRF_TRUSTED_ORIGINS = ["https://minitwit-team-t-ti79k.ondigitalocean.app"]
