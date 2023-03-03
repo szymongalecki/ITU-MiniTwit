@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 
 
 """
-CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION CONFIGURATION 
+CONFIGURATION 
 """
 
 app = FastAPI()
@@ -20,12 +20,18 @@ LATEST = 0
 
 
 """
-DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS DATA MODELS
+DATA MODELS 
 """
 
 
 class Message(BaseModel):
     content: str
+
+
+class Tweet(BaseModel):
+    content: str
+    pub_date: int
+    user: str
 
 
 class User(BaseModel):
@@ -40,25 +46,26 @@ class Follow_Unfollow(BaseModel):
 
 
 """
-HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS HELPER FUNCTIONS
+HELPER FUNCTIONS 
 """
 
 
-def init_db():
-    """Creates the database tables."""
+def init_db() -> None:
+    """Creates the database tables"""
     with closing(sqlite3.connect(DATABASE)) as db:
         with open("schema.sql", "r") as f:
             db.cursor().executescript(f.read())
         db.commit()
 
 
-def update_latest(latest: int):
+def update_latest(latest: int) -> None:
+    """Updates value of global variable LATEST"""
     global LATEST
     LATEST = latest if latest != -1 else LATEST
 
 
-def execute_query(query: str, parameters: Tuple):
-    """Executes query with provided parameters, fetches all results, commits changes"""
+def execute_query(query: str, parameters: Tuple) -> list | None:
+    """Executes query with given parameters, fetches all results, commits to db"""
     response = None
     try:
         connection = sqlite3.connect(DATABASE)
@@ -80,8 +87,8 @@ def execute_query(query: str, parameters: Tuple):
         return response
 
 
-def get_user_id(username: str):
-    """Returns user_id if username exists in database."""
+def get_user_id(username: str) -> int | HTTPException:
+    """Returns user_id if username exists in database"""
     query = """
             SELECT user_id 
             FROM user 
@@ -90,7 +97,6 @@ def get_user_id(username: str):
     parameters = (username,)
     response = execute_query(query, parameters)
     user_id = None if response is None else response[0][0]
-    # user_id = single_value(response)
     if user_id is None:
         raise HTTPException(status_code=404, detail="username not found")
     else:
@@ -98,19 +104,19 @@ def get_user_id(username: str):
 
 
 """
-GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET
+GET ENDPOINTS
 """
 
 
-@app.get("/latest")
-def get_latest():
-    """Returns integer used by simulator to track requests"""
+@app.get("/latest", status_code=200)
+def get_latest() -> dict[str, int]:
+    """Returns value of global variable LATEST"""
     global LATEST
     return {"latest": LATEST}
 
 
-@app.get("/msgs")
-def get_messages(latest: int, no: int = LIMIT):
+@app.get("/msgs", status_code=200)
+def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages"""
     update_latest(latest)
     limit = no if no else LIMIT
@@ -124,14 +130,15 @@ def get_messages(latest: int, no: int = LIMIT):
     parameters = (limit,)
     response = execute_query(query, parameters)
     if response is not None:
-        return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
+        return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
+        # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
 
 @app.get("/msgs/{username}", status_code=200)
-def get_user_messages(username: str, latest: int, no: int = LIMIT):
-    """Returns the latest messages of given user"""
+def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
+    """Returns the latest messages of a given user"""
     update_latest(latest)
     limit = no if no else LIMIT
     user_id = get_user_id(username)
@@ -145,14 +152,17 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT):
     parameters = (user_id, limit)
     response = execute_query(query, parameters)
     if response is not None:
-        return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
+        return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
+        # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
 
-@app.get("/fllws/{username}")
-def get_user_followers(username: str, latest: int, no: int = LIMIT):
-    """Returns followers of given user"""
+@app.get("/fllws/{username}", status_code=200)
+def get_user_followers(
+    username: str, latest: int, no: int = LIMIT
+) -> dict[str, list[str]]:
+    """Returns followers of a given user"""
     update_latest(latest)
     limit = no if no else LIMIT
     user_id = get_user_id(username)
@@ -171,13 +181,13 @@ def get_user_followers(username: str, latest: int, no: int = LIMIT):
 
 
 """
-POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST POST 
+POST ENDPOINTS 
 """
 
 
 @app.post("/register", status_code=204)
-def post_register_user(latest: int, user: User):
-    """Registers new user with provided data"""
+def post_register_user(latest: int, user: User) -> None:
+    """Registers a new user with the given data"""
     update_latest(latest)
     try:
         get_user_id(user.username)
@@ -197,8 +207,8 @@ def post_register_user(latest: int, user: User):
 
 
 @app.post("/msgs/{username}", status_code=204)
-def post_user_messages(username: str, latest: int, message: Message):
-    """Posts message as given username"""
+def post_user_messages(username: str, latest: int, message: Message) -> None:
+    """Posts message as a given user"""
     update_latest(latest)
     user_id = get_user_id(username)
     query = """
@@ -210,8 +220,8 @@ def post_user_messages(username: str, latest: int, message: Message):
 
 
 @app.post("/fllws/{username}", status_code=204)
-def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow):
-    """Follows or unfollows user"""
+def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow) -> None:
+    """Follows or unfollows user for another given user"""
     update_latest(latest)
     follower = get_user_id(username)
     if f_u.follow:
@@ -231,11 +241,15 @@ def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow):
 
 
 """
-EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY DATABASE EMPTY
+EMPTY DATABASE
 """
 
 os.system(f"rm {DATABASE}")
 init_db()
 
+"""
+GUARD & RUN 
+"""
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run("minitwit_api:app", host="0.0.0.0", port=8080, reload=True)
