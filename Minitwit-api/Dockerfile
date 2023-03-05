@@ -18,7 +18,6 @@ COPY . /usr/src
 EXPOSE 8080
 
 
-
 # Build and run the server when the container is started
 CMD ["sh", "-c", "python minitwit_api.py"]
 
