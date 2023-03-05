@@ -17,6 +17,7 @@ COPY . /usr/src
 # Make port 8080 available to the host
 EXPOSE 8080
 
+
 # Build and run the server when the container is started
 CMD ["sh", "-c", "python minitwit_api.py"]
 
