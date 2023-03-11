@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+
+  minitwitimage:
+    image: ${DOCKER_USERNAME}/minitwitimage
+    container_name: minitwit
+    ports:
+        - '8000:8000'

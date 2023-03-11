@@ -80,16 +80,10 @@ Vagrant.configure("2") do |config|
     echo "cd /minitwit" >> ~/.bash_profile
 
     chmod +x /minitwit/deploy.sh
+    sh /minitwit/deploy.sh
     
     echo -e "\nVagrant setup done ..."
-    echo -e "minitwit will later be accessible at http://$(hostname -I | awk '{print $1}'):5000"
-    echo -e "The mysql database needs a minute to initialize, if the landing page is stack-trace ..."
-    apt install -y python3-pip
-    pip install --upgrade pip
-    pip install django
-    git clone https://github.com/szymongalecki/ITU-MiniTwit.git
-    cd ITU-MiniTwit/ITU_MiniTwit
-    python3 manage.py runserver 0.0.0.0:8000
+    echo -e "minitwit will later be accessible at http://$(hostname -I | awk '{print $1}'):8000"
     SHELL
   end
 end
