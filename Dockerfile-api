@@ -12,7 +12,7 @@ COPY ./new_requirements.txt /usr/src
 
 RUN pip install -r new_requirements.txt
 
-COPY . /usr/src
+COPY ./Minitwit_api /usr/src
 
 # Make port 8080 available to the host
 EXPOSE 8080
