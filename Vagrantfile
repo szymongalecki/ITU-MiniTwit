@@ -80,7 +80,6 @@ Vagrant.configure("2") do |config|
     echo "cd /minitwit" >> ~/.bash_profile
 
     chmod +x /minitwit/deploy.sh
-    sh /minitwit/deploy.sh
     
     echo -e "\nVagrant setup done ..."
     echo -e "minitwit will later be accessible at http://$(hostname -I | awk '{print $1}'):8000"
