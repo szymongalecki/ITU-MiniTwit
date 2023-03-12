@@ -1,11 +1,18 @@
-# Build image:      `docker build --tag minitwit/db .`
-# Run container:    `docker run --rm minitwit/db`
+# Build image:      
+#   `docker build --tag minitwit/db .`
 
-# Parent image, ref - https://hub.docker.com/_/alpine
+# Run container and access sqlite termninal:    
+#   `docker run -it --name dbtest --mount source=db_volume,target=/db  minitwit/db `
+
+# Run container in a detached state and launch bash to inspect container:
+#   `docker run -itd --name dbtest --mount source=db_volume,target=/db  minitwit/db`
+#   `docker exec -it dbtest bash`         
+
+# Parent image
 FROM ubuntu:latest
 
 # Set the working directory
-WORKDIR /usr/src
+WORKDIR /db
 
 # Update apt repository cache, update apt-cache, install SQLite3
 RUN apt-get -y update                               && \
@@ -13,12 +20,9 @@ RUN apt-get -y update                               && \
     apt-get install -y sqlite3 libsqlite3-dev
 
 # Copy db file 
-COPY minitwit.db /usr/src
+COPY minitwit.db /db
 
-# Read db file
-RUN sqlite3 /usr/src/minitwit.db
-
-# Current issues
-# 1. Don't know if the db content was read correctly and if I should include schema.
-# 2. Don't know why the container closes after launching altough image was built correctly.
-#   Probably there is no defined entrypoint and it seems like everything is done after reading db.
+# Every time the container is launched create a dump file of initial state and
+# open minitwit database
+CMD sqlite3 minitwit.db .dump > initial_state_dump.sql; \
+    sqlite3 minitwit.db
