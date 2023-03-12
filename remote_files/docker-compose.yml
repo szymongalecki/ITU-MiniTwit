@@ -7,3 +7,8 @@ services:
     container_name: minitwit
     ports:
         - '8000:8000'
+  minitwitapi:
+    image: ${DOCKER_USERNAME}/apiminitwit
+    container_name: minitwitapi
+    ports:
+        - '8001:8080'
