@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db: 
+    build: ./Minitwit-db
+    container_name: db-container
+    tty: true
+    networks: 
+      - db-network
+    volumes: 
+      - db-volume:/db
+
+  api:
+    build: ./Minitwit-api
+    container_name: api-container
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    networks:
+      - db-network
+    
+  app:
+    build: ./ITU_MiniTwit
+    container_name: app-container
+    depends_on:
+      - db
+    ports: 
+      - "8000:8000"
+    networks:
+      - db-network
+
+volumes: 
+  db-volume:
+
+networks: 
+  db-network: 
