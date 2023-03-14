@@ -22,6 +22,9 @@ RUN apt-get -y update                               && \
 # Copy db file 
 COPY minitwit.db /db
 
+# Add all file permissions 
+RUN chmod 777 minitwit.db
+
 # Every time the container is launched create a dump file of initial state and
 # open minitwit database
 CMD sqlite3 minitwit.db .dump > initial_state_dump.sql; \
