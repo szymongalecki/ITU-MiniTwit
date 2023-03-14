@@ -60,18 +60,13 @@ Vagrant.configure("2") do |config|
 
     # Install make
     sudo apt-get install -y make
-    
-    echo -e "\nVerifying that docker works ...\n"
-    docker run --rm hello-world
-    docker rmi hello-world
 
     echo -e "\nOpening port for minitwit ...\n"
-    ufw allow 5000 && \
     ufw allow 8000 && \
     ufw allow 22/tcp
 
     echo ". $HOME/.bashrc" >> $HOME/.bash_profile
-
+    
     echo -e "\nConfiguring credentials as environment variables...\n"
 
     source $HOME/.bash_profile
