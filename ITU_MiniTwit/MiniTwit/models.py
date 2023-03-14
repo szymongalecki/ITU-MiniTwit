@@ -9,33 +9,25 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-class Follower(models.Model):
-    who_id = models.IntegerField(blank=True, null=True)
-    whom_id = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'follower'
-
-
-class Message(models.Model):
-    message_id = models.AutoField(primary_key=True, blank=True, null=False)
-    author_id = models.IntegerField()
-    text = models.TextField()  # This field type is a guess.
-    pub_date = models.IntegerField(blank=True, null=True)
-    flagged = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'message'
-
-
 class User(AbstractUser):
-    user_id = models.AutoField(primary_key=True, blank=True, null=False)
     username = models.TextField(max_length=50, unique=True, null=False)  # This field type is a guess.
     email = models.TextField(unique=True, null=False)  # This field type is a guess.
-    password = models.CharField(db_column='pw_hash', max_length=128)   # This field type is a guess.
-
+    
     class Meta:
-        managed = False
         db_table = 'user'
+
+class Follower(models.Model):
+    who = models.ForeignKey(User, related_name='who', on_delete=models.CASCADE, null=True)
+    whom = models.ForeignKey(User, related_name='whom', on_delete=models.CASCADE, null=True)
+    
+    class Meta:
+        db_table = 'follower'
+
+class Message(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    text = models.CharField(max_length=280, null=False)
+    pub_date = models.DateTimeField(auto_now_add=True)
+    flagged = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'message'

@@ -2,6 +2,7 @@ import time
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .forms import CustomUserCreationForm
 from .models import Message, User, Follower
@@ -26,12 +27,26 @@ def public_timeline(request):
         user = User.objects.get(id=request.user.id)
     else:
         user = None
-    messages = Message.objects.all().order_by('-pub_date')
+    # messages = Message.objects.all().order_by('-pub_date')
     view = "public_timeline"
+    messages = Message.objects.all().order_by('-pub_date')
+    paginator = Paginator(messages, 10)  # 10 messages per page
+
+    page = request.GET.get('page')
+    try:
+        messages_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        messages_page = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        messages_page = paginator.page(paginator.num_pages)
+
     context = {
         "view":view,
         "messages":messages,
-        "user":user
+        "user":user,
+        'messages_page': messages_page
     }
     return render(request, 'MiniTwit/timeline.html', context)
 
@@ -77,7 +92,7 @@ def unfollow_user(request, pk):
 
 def add_message(request):
     user = User.objects.get(id=request.user.id)
-    message = Message(author_id = user, text = request.POST.get('text',''), pub_date = int(time.time()))
+    message = Message(author_id = request.user.id, text = request.POST.get('text',''), pub_date = int(time.time()))
     message.save()
     return timeline(request)
 
@@ -85,3 +100,4 @@ class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("MiniTwit:login")
     template_name = "registration/signup.html"
+ 
