@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
       # line specifies the DigitalOcean API token that will be used to create and manage the virtual machine.
       provider.token = ENV["DIGITAL_OCEAN_TOKEN"]
       #specifies the base image that will be used to create the virtual machine.
-      provider.image = 'ubuntu-20-04-x64'
+      provider.image = 'ubuntu-22-04-x64'
       #specifies the region where the virtual machine will be created.
       provider.region = 'fra1'
       # specifies the size of the virtual machine.
