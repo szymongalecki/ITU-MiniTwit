@@ -1,2 +1,7 @@
-docker-compose -f /minitwit/docker-compose.yml pull
-docker-compose -f /minitwit/docker-compose.yml up -d
+#!/bin/bash
+. ~/.bash_profile
+
+cd /minitwit
+
+docker-compose -f docker-compose.yml pull
+docker-compose -f docker-compose.yml up -d

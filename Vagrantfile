@@ -66,7 +66,7 @@ Vagrant.configure("2") do |config|
     ufw allow 22/tcp
 
     echo ". $HOME/.bashrc" >> $HOME/.bash_profile
-    
+
     echo -e "\nConfiguring credentials as environment variables...\n"
 
     source $HOME/.bash_profile
