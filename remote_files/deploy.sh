@@ -1,4 +1,5 @@
-source ~/.bash_profile
+#!/bin/bash
+. ~/.bash_profile
 
 cd /minitwit
 
