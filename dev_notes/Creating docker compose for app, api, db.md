@@ -108,7 +108,7 @@ docker exec -it frosty_williamson mongosh
 ```
 
 Mongo database and mongo-express interface 
-```yml
+```
 # Use root/example as user/password credentials
 version: '3.1'
 services:
@@ -162,15 +162,15 @@ example> db.example1.find()
 
 
 It appears in the mongo-express.
-![[mongo-express.png]]
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/mongo-express.png)
 ### Postgres is added as an alternative to Mongo
 
 To access Postgres through interface use Adminer on port :8082.
-![[postgres_credentials.png]]
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/postgres_credentials.png)
 
 ### Final docker compose with two DBMS containers and interfaces, Django Application and FastAPI API
 
-```yml
+```
 # Passwords are explicit, for tests only, do not use for production :)
 version: '3'
 services:
