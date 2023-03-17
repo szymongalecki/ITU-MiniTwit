@@ -63,6 +63,11 @@ Vagrant.configure("2") do |config|
 
     echo -e "\nOpening port for minitwit ...\n"
     ufw allow 8000 && \
+    ufw allow 27017 && \
+    ufw allow 8081 && \
+    ufw allow 5432 && \
+    ufw allow 8082 && \
+    ufw allow 8080 && \
     ufw allow 22/tcp
 
     echo ". $HOME/.bashrc" >> $HOME/.bash_profile
