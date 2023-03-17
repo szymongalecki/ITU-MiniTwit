@@ -1,4 +1,5 @@
-Which CI/CD solutions?
+**Author: Dagmara Przygocka**
+### Which CI/CD solutions?
 
  On the market there are two categories of CI/CD systems:
  - self hosted like Jenkins
@@ -19,6 +20,94 @@ Which CI/CD solutions?
  - vast online community support (shared issues and solutions to problem we can encounter) 
  
  The configuration of of the pipeline is in file continous-deployment.yml in folder: .github/workflows.
+ 
+ ```
+name: Continuous Deployment
+
+on:
+  push:
+    # Run workflow every time something is pushed to the main branch
+    branches:
+      - main
+  # allow manual triggers for now too
+  workflow_dispatch:
+    manual: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push minitwitimage
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile-minitwit
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
+
+      #- name: Build and push sqlite database
+      #  uses: docker/build-push-action@v2
+      #  with:
+      #    context: .
+      #    file: ./Dockerfile-sqlite
+      #    push: true
+      #    tags: ${{ secrets.DOCKER_USERNAME }}/sqliteimage:latest
+      #    cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/sqliteimage:sqlitebuildcache
+      #    cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/sqliteimage:sqlitebuildcache,mode=max
+
+      - name: Build and push minitwit-api
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile-api
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/apiminitwit:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi,mode=max
+
+      #- name: Test minitwit
+      #  run: |
+      #    docker build -t $DOCKER_USERNAME/minitwittestimage -f Dockerfile-minitwit-tests .
+      #    yes 2>/dev/null | docker-compose up -d
+      #    docker run --rm --network=itu-minitwit-network $DOCKER_USERNAME/minitwittestimage
+      #  env:
+      #    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/do_ssh_key
+          chmod 600 ~/.ssh/do_ssh_key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy to server
+        # Configure the ~./bash_profile and deploy.sh file on the Vagrantfile
+        run: >
+          ssh $SSH_USER@$SSH_HOST
+          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
+          '/minitwit/deploy.sh'
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+ ```
+ The file continous_deployment.yml file will be changed as the project evolves.
+ 
  The file contains following setup:
  - Trigger:
   - Trigger the workflow everytime there is a push to main branch. Additionally, allow manuall trigger of thw workflow.
