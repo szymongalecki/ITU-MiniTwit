@@ -12,13 +12,25 @@ def timeline(request):
         user = User.objects.get(id=request.user.id)
         follower = Follower.objects.filter(who_id = user.id).values_list('whom_id')
         messages = Message.objects.filter(author_id__in = follower).order_by('-pub_date')
-        view = "timeline"
+        paginator = Paginator(messages, 10)  # 10 messages per page
+
+        page = request.GET.get('page')
+        try:
+            messages_page = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            messages_page = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range, deliver last page of results.
+            messages_page = paginator.page(paginator.num_pages)
+            view = "timeline"
     else:
         return public_timeline(request)
     context = {
         "view":view,
         "messages":messages,
-        "user":user
+        "user":user,
+        'messages_page': messages_page
     }
     return render(request, 'MiniTwit/timeline.html', context)
 

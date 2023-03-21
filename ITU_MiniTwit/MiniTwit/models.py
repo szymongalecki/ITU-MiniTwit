@@ -26,7 +26,7 @@ class Follower(models.Model):
 class Message(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     text = models.CharField(max_length=280, null=False)
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(null=False)
     flagged = models.BooleanField(default=False)
     
     class Meta:
