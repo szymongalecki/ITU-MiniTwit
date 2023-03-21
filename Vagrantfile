@@ -63,8 +63,8 @@ Vagrant.configure("2") do |config|
 
     echo -e "\nOpening port for minitwit ...\n"
     ufw allow 8000 && \
-    ufw allow 27017 && \
-    ufw allow 8081 && \
+    ufw allow 5000 && \
+    ufw allow 5003 && \
     ufw allow 5432 && \
     ufw allow 8082 && \
     ufw allow 8080 && \
