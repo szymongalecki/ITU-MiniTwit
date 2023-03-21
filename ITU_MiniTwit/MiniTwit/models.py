@@ -10,8 +10,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    username = models.TextField(max_length=50, unique=True, null=False)  # This field type is a guess.
-    email = models.TextField(unique=True, null=False)  # This field type is a guess.
+    username = models.CharField(max_length=50, unique=True, null=False)
+    email = models.EmailField(unique=True, null=False)
     
     class Meta:
         db_table = 'user'
@@ -31,3 +31,12 @@ class Message(models.Model):
     
     class Meta:
         db_table = 'message'
+
+class MigrateMessages(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    text = models.CharField(max_length=280, null=False)
+    pub_date = models.DateTimeField(null=False)
+    flagged = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'migrateMessages'
