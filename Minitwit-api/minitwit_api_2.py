@@ -1,4 +1,5 @@
 from contextlib import closing
+from datetime import datetime
 import os
 import time
 from fastapi import FastAPI, HTTPException
@@ -14,7 +15,13 @@ CONFIGURATION
 """
 
 app = FastAPI()
-CONNECTION = None
+CONNECTION = psycopg2.connect(
+    database="postgres",
+    user="postgres",
+    password="postgres",
+    host="DB-postgres",
+    port="5432",
+)
 LIMIT = 100
 LATEST = 0
 
@@ -30,7 +37,7 @@ class Message(BaseModel):
 
 class Tweet(BaseModel):
     content: str
-    pub_date: int
+    pub_date: datetime
     user: str
 
 
@@ -50,12 +57,10 @@ HELPER FUNCTIONS
 """
 
 
-# def init_db() -> None:
-#     """Creates the database tables"""
-#     with closing(sqlite3.connect(DATABASE)) as db:
-#         with open("schema.sql", "r") as f:
-#             db.cursor().executescript(f.read())
-#         db.commit()
+def initialise_db():
+    """Creates the database tables"""
+    with open("minitwit_schema.sql", "r") as f:
+        post_query(f.read(), ())
 
 
 def update_latest(latest: int) -> None:
@@ -64,14 +69,18 @@ def update_latest(latest: int) -> None:
     LATEST = latest if latest != -1 else LATEST
 
 
-def connect_db() -> psycopg2.connection:
+def connect_db():
     """Returns connection to db"""
     return psycopg2.connect(
-        database="postgres", user="postgres", password="postgres", host="0.0.0.0"
+        database="postgres",
+        user="postgres",
+        password="postgres",
+        host="DB-postgres",
+        port="5432",
     )
 
 
-def reconnect_db() -> None:
+def reconnect_db():
     """Reconnect to database if connection is terminated"""
     global CONNECTION
     CONNECTION = connect_db()
@@ -79,45 +88,44 @@ def reconnect_db() -> None:
 
 def get_query(query: str, parameters: Tuple) -> list:
     """Execute query related to get endpoint"""
-    response = []
-    if CONNECTION is None:
+    if not CONNECTION:
         reconnect_db()
-    try:
-        cursor = CONNECTION.cursor()
-        response = cursor.execute(query, parameters)
-        return response
-    except Exception as e:
-        print(f"Failed to execute query: {e}")
+
+    with CONNECTION as connection:
+        with connection.cursor() as curs:
+            curs.execute(query, parameters)
+            return curs.fetchall()
 
 
 def post_query(query: str, parameters: Tuple) -> None:
     """Execute query related to post endpoint"""
+    if not CONNECTION:
+        reconnect_db()
+
     with CONNECTION as connection:
         with connection.cursor() as cursor:
             cursor.execute(query, parameters)
 
 
-def get_user_id(username: str) -> int | HTTPException:
+def get_user_id(username: str) -> int | None:
     """Returns user_id if username exists in database"""
     query = """
-            SELECT user_id 
-            FROM user 
-            WHERE username = ?
+            SELECT id
+            FROM public.user
+            WHERE username = (%s)
             """
     parameters = (username,)
-    response = execute_query(query, parameters)
-    user_id = None if response is None else response[0][0]
-    if user_id is None:
-        raise HTTPException(status_code=404, detail="username not found")
-    else:
-        return user_id
+    response = get_query(query, parameters)
+    if response != []:
+        return response[0][0]
+    return None
 
 
 """
 GET ENDPOINTS
 """
 
-
+# OK
 @app.get("/latest", status_code=200)
 def get_latest() -> dict[str, int]:
     """Returns value of global variable LATEST"""
@@ -125,27 +133,37 @@ def get_latest() -> dict[str, int]:
     return {"latest": LATEST}
 
 
+# OK, for tests only
+@app.get("/users", status_code=200)
+def get_users():
+    """Returns all usernames"""
+    response = get_query("SELECT username FROM public.user", ())
+    return response
+
+
+# OK
 @app.get("/msgs", status_code=200)
 def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages"""
     update_latest(latest)
     limit = no if no else LIMIT
     query = """
-            SELECT message.text, message.pub_date, user.username 
-            FROM message, user 
-            WHERE message.flagged = 0 AND
-            user.user_id = message.author_id
-            ORDER BY message.pub_date DESC LIMIT ?
+            SELECT public.message.text, public.message.pub_date, public.user.username
+            FROM public.message, public.user
+            WHERE public.message.flagged = False AND
+            public.user.id = public.message.author_id
+            ORDER BY public.message.pub_date DESC LIMIT (%s)
             """
     parameters = (limit,)
-    response = execute_query(query, parameters)
-    if response is not None:
+    response = get_query(query, parameters)
+    if response != []:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
         # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
 
+# OK
 @app.get("/msgs/{username}", status_code=200)
 def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages of a given user"""
@@ -153,14 +171,14 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
     limit = no if no else LIMIT
     user_id = get_user_id(username)
     query = """
-            SELECT message.text, message.pub_date, user.username 
-            FROM message, user 
-            WHERE message.flagged = 0 AND
-            user.user_id = message.author_id AND user.user_id = ?
-            ORDER BY message.pub_date DESC LIMIT ?
+            SELECT public.message.text, public.message.pub_date, public.user.username 
+            FROM public.message, public.user 
+            WHERE public.message.flagged = False AND
+            public.user.id = public.message.author_id AND public.user.id = (%s)
+            ORDER BY public.message.pub_date DESC LIMIT (%s)
             """
     parameters = (user_id, limit)
-    response = execute_query(query, parameters)
+    response = get_query(query, parameters)
     if response is not None:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
         # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
@@ -183,7 +201,7 @@ def get_user_followers(
             LIMIT ?
             """
     parameters = (user_id, limit)
-    response = execute_query(query, parameters)
+    response = get_query(query, parameters)
     if response is None:
         return {"follows": []}
     else:
@@ -194,26 +212,30 @@ def get_user_followers(
 POST ENDPOINTS 
 """
 
-
+# OK
 @app.post("/register", status_code=204)
 def post_register_user(latest: int, user: User) -> None:
-    """Registers a new user with the given data"""
     update_latest(latest)
-    try:
-        get_user_id(user.username)
-    except HTTPException as user_does_not_exist:
-        pass
-    else:
+    if get_user_id(user.username) is not None:
         raise HTTPException(status_code=400, detail="The username is already taken")
-
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
-            INSERT INTO user (username, email, pw_hash) 
-            VALUES (?, ?, ?)
+            INSERT INTO public.user (username, email, password, date_joined, first_name, last_name, is_superuser, is_staff, is_active) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-    parameters = (user.username, user.email, generate_password_hash(user.pwd))
-    execute_query(query, parameters)
+    parameters = (
+        user.username,
+        user.email,
+        generate_password_hash(user.pwd),
+        datetime.now(),
+        "",
+        "",
+        False,
+        False,
+        False,
+    )
+    post_query(query, parameters)
 
 
 @app.post("/msgs/{username}", status_code=204)
@@ -226,7 +248,7 @@ def post_user_messages(username: str, latest: int, message: Message) -> None:
             VALUES (?, ?, ?, 0)
             """
     parameters = (user_id, message.content, int(time.time()))
-    execute_query(query, parameters)
+    post_query(query, parameters)
 
 
 @app.post("/fllws/{username}", status_code=204)
@@ -247,19 +269,18 @@ def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow) 
                 WHERE who_id=? and WHOM_ID=?
                 """
     parameters = (follower, user)
-    execute_query(query, parameters)
+    post_query(query, parameters)
 
 
 """
 EMPTY DATABASE
 """
 
-os.system(f"rm {DATABASE}")
-init_db()
+# initialise_db()
 
 """
 GUARD & RUN 
 """
 
 if __name__ == "__main__":
-    uvicorn.run("minitwit_api:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("minitwit_api_2:app", host="0.0.0.0", port=8080, reload=True)
