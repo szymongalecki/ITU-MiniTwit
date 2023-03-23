@@ -57,10 +57,19 @@ HELPER FUNCTIONS
 """
 
 
-def initialise_db():
+def initialise_db() -> None:
     """Creates the database tables"""
     with open("minitwit_schema.sql", "r") as f:
         post_query(f.read(), ())
+
+
+def delete_all_rows() -> None:
+    query = """
+            DELETE FROM public.follower;
+            DELETE FROM public.message;
+            DELETE FROM public.user;
+            """
+    post_query(query, ())
 
 
 def update_latest(latest: int) -> None:
@@ -80,30 +89,18 @@ def connect_db():
     )
 
 
-def reconnect_db():
-    """Reconnect to database if connection is terminated"""
-    global CONNECTION
-    CONNECTION = connect_db()
-
-
 def get_query(query: str, parameters: Tuple) -> list:
     """Execute query related to get endpoint"""
-    if not CONNECTION:
-        reconnect_db()
-
-    with CONNECTION as connection:
-        with connection.cursor() as curs:
-            curs.execute(query, parameters)
-            return curs.fetchall()
+    with connect_db() as db:
+        with db.cursor() as cursor:
+            cursor.execute(query, parameters)
+            return cursor.fetchall()
 
 
 def post_query(query: str, parameters: Tuple) -> None:
     """Execute query related to post endpoint"""
-    if not CONNECTION:
-        reconnect_db()
-
-    with CONNECTION as connection:
-        with connection.cursor() as cursor:
+    with connect_db() as db:
+        with db.cursor() as cursor:
             cursor.execute(query, parameters)
 
 
@@ -121,11 +118,17 @@ def get_user_id(username: str) -> int | None:
     return None
 
 
+def user_not_found(user_id: int | None) -> None | HTTPException:
+    """Throws exception if user_id is not an integer"""
+    if user_id is None:
+        raise HTTPException(status_code=404, detail="username not found")
+
+
 """
 GET ENDPOINTS
 """
 
-# OK
+
 @app.get("/latest", status_code=200)
 def get_latest() -> dict[str, int]:
     """Returns value of global variable LATEST"""
@@ -133,15 +136,6 @@ def get_latest() -> dict[str, int]:
     return {"latest": LATEST}
 
 
-# OK, for tests only
-@app.get("/users", status_code=200)
-def get_users():
-    """Returns all usernames"""
-    response = get_query("SELECT username FROM public.user", ())
-    return response
-
-
-# OK
 @app.get("/msgs", status_code=200)
 def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages"""
@@ -158,18 +152,17 @@ def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
     response = get_query(query, parameters)
     if response != []:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
-        # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
 
-# OK
 @app.get("/msgs/{username}", status_code=200)
 def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages of a given user"""
     update_latest(latest)
     limit = no if no else LIMIT
     user_id = get_user_id(username)
+    user_not_found(user_id)
     query = """
             SELECT public.message.text, public.message.pub_date, public.user.username 
             FROM public.message, public.user 
@@ -181,7 +174,6 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
     response = get_query(query, parameters)
     if response is not None:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
-        # return [dict(zip(["content", "pub_date", "user"], r)) for r in response]
     else:
         return []
 
@@ -194,11 +186,12 @@ def get_user_followers(
     update_latest(latest)
     limit = no if no else LIMIT
     user_id = get_user_id(username)
+    user_not_found(user_id)
     query = """
-            SELECT user.username FROM user
-            INNER JOIN follower ON follower.whom_id=user.user_id
-            WHERE follower.who_id=?
-            LIMIT ?
+            SELECT public.user.username FROM public.user
+            INNER JOIN public.follower ON public.follower.whom_id=public.user.id
+            WHERE public.follower.who_id = (%s)
+            LIMIT (%s)
             """
     parameters = (user_id, limit)
     response = get_query(query, parameters)
@@ -212,7 +205,7 @@ def get_user_followers(
 POST ENDPOINTS 
 """
 
-# OK
+
 @app.post("/register", status_code=204)
 def post_register_user(latest: int, user: User) -> None:
     update_latest(latest)
@@ -243,11 +236,12 @@ def post_user_messages(username: str, latest: int, message: Message) -> None:
     """Posts message as a given user"""
     update_latest(latest)
     user_id = get_user_id(username)
+    user_not_found(user_id)
     query = """
-            INSERT INTO message (author_id, text, pub_date, flagged)
-            VALUES (?, ?, ?, 0)
+            INSERT INTO public.message (author_id, text, pub_date, flagged)
+            VALUES (%s, %s, %s, %s)
             """
-    parameters = (user_id, message.content, int(time.time()))
+    parameters = (user_id, message.content, datetime.now(), False)
     post_query(query, parameters)
 
 
@@ -255,32 +249,37 @@ def post_user_messages(username: str, latest: int, message: Message) -> None:
 def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow) -> None:
     """Follows or unfollows user for another given user"""
     update_latest(latest)
-    follower = get_user_id(username)
+    follower_id = get_user_id(username)
+    user_not_found(follower_id)
     if f_u.follow:
-        user = get_user_id(f_u.follow)
+        user_id = get_user_id(f_u.follow)
+        user_not_found(user_id)
         query = """ 
-                INSERT INTO follower (who_id, whom_id) 
-                VALUES (?, ?) 
+                INSERT INTO public.follower (who_id, whom_id) 
+                VALUES (%s, %s) 
                 """
     else:
-        user = get_user_id(f_u.unfollow)
+        user_id = get_user_id(f_u.unfollow)
+        user_not_found(user_id)
         query = """
-                DELETE FROM follower 
-                WHERE who_id=? and WHOM_ID=?
+                DELETE FROM public.follower 
+                WHERE who_id = (%s) and WHOM_ID = (%s)
                 """
-    parameters = (follower, user)
+    parameters = (follower_id, user_id)
     post_query(query, parameters)
 
 
 """
-EMPTY DATABASE
+INITIALISE DATABASE / DELETE ALL ROWS
 """
 
 # initialise_db()
+# delete_all_rows()
 
 """
 GUARD & RUN 
 """
 
 if __name__ == "__main__":
+    delete_all_rows()
     uvicorn.run("minitwit_api_2:app", host="0.0.0.0", port=8080, reload=True)
