@@ -2,10 +2,10 @@ from contextlib import closing
 from datetime import datetime
 import os
 import time
-from fastapi import FastAPI, HTTPException
-import sqlite3
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-from typing import Tuple
+from typing import Tuple, Annotated
 import uvicorn
 from werkzeug.security import generate_password_hash
 import psycopg2
@@ -15,13 +15,6 @@ CONFIGURATION
 """
 
 app = FastAPI()
-CONNECTION = psycopg2.connect(
-    database="postgres",
-    user="postgres",
-    password="postgres",
-    host="DB-postgres",
-    port="5432",
-)
 LIMIT = 100
 LATEST = 0
 
