@@ -1,11 +1,7 @@
-from contextlib import closing
 from datetime import datetime
-import os
-import time
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from typing import Tuple, Annotated
+from typing import Tuple
 import uvicorn
 from werkzeug.security import generate_password_hash
 import psycopg2
@@ -48,6 +44,16 @@ class Follow_Unfollow(BaseModel):
 """
 HELPER FUNCTIONS 
 """
+
+
+def authenticate_simulator(request: Request) -> None | HTTPException:
+    if (
+        "Authorization" not in request.headers
+        or "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh" != request.headers["Authorization"]
+    ):
+        raise HTTPException(
+            status_code=403, detail="You are not authorized to use this resource!"
+        )
 
 
 def initialise_db() -> None:
@@ -130,10 +136,10 @@ def get_latest() -> dict[str, int]:
 
 
 @app.get("/msgs", status_code=200)
-def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
+def get_messages(request: Request, latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages"""
     update_latest(latest)
-    limit = no if no else LIMIT
+    authenticate_simulator(request)
     query = """
             SELECT public.message.text, public.message.pub_date, public.user.username
             FROM public.message, public.user
@@ -141,7 +147,7 @@ def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
             public.user.id = public.message.author_id
             ORDER BY public.message.pub_date DESC LIMIT (%s)
             """
-    parameters = (limit,)
+    parameters = (no,)
     response = get_query(query, parameters)
     if response != []:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
@@ -150,10 +156,12 @@ def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
 
 
 @app.get("/msgs/{username}", status_code=200)
-def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
+def get_user_messages(
+    request: Request, username: str, latest: int, no: int = LIMIT
+) -> list[Tweet]:
     """Returns the latest messages of a given user"""
     update_latest(latest)
-    limit = no if no else LIMIT
+    authenticate_simulator(request)
     user_id = get_user_id(username)
     user_not_found(user_id)
     query = """
@@ -163,7 +171,7 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
             public.user.id = public.message.author_id AND public.user.id = (%s)
             ORDER BY public.message.pub_date DESC LIMIT (%s)
             """
-    parameters = (user_id, limit)
+    parameters = (user_id, no)
     response = get_query(query, parameters)
     if response is not None:
         return [Tweet(content=r[0], pub_date=r[1], user=r[2]) for r in response]
@@ -173,11 +181,11 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
 
 @app.get("/fllws/{username}", status_code=200)
 def get_user_followers(
-    username: str, latest: int, no: int = LIMIT
+    request: Request, username: str, latest: int, no: int = LIMIT
 ) -> dict[str, list[str]]:
     """Returns followers of a given user"""
     update_latest(latest)
-    limit = no if no else LIMIT
+    authenticate_simulator(request)
     user_id = get_user_id(username)
     user_not_found(user_id)
     query = """
@@ -186,7 +194,7 @@ def get_user_followers(
             WHERE public.follower.who_id = (%s)
             LIMIT (%s)
             """
-    parameters = (user_id, limit)
+    parameters = (user_id, no)
     response = get_query(query, parameters)
     if response is None:
         return {"follows": []}
@@ -225,9 +233,12 @@ def post_register_user(latest: int, user: User) -> None:
 
 
 @app.post("/msgs/{username}", status_code=204)
-def post_user_messages(username: str, latest: int, message: Message) -> None:
+def post_user_messages(
+    request: Request, username: str, latest: int, message: Message
+) -> None:
     """Posts message as a given user"""
     update_latest(latest)
+    authenticate_simulator(request)
     user_id = get_user_id(username)
     user_not_found(user_id)
     query = """
@@ -239,9 +250,12 @@ def post_user_messages(username: str, latest: int, message: Message) -> None:
 
 
 @app.post("/fllws/{username}", status_code=204)
-def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow) -> None:
+def post_follow_unfollow_user(
+    request: Request, username: str, latest: int, f_u: Follow_Unfollow
+) -> None:
     """Follows or unfollows user for another given user"""
     update_latest(latest)
+    authenticate_simulator(request)
     follower_id = get_user_id(username)
     user_not_found(follower_id)
     if f_u.follow:
