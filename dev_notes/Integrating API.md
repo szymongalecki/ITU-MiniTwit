@@ -6,7 +6,7 @@ New integration is needed because of two reasons.
 - Secondly, because Django application uses data models and not the original schema from Flask app, it created its own database separate from API's database. We want to have a single database that will be accessed by both application and API. Compromise between two schemas was achieved and it's time to adjust few query's to the new shape of schema.
 
 ### Database service definition in docker-compose file
-```yml
+```
 postgres:
 	image: postgres
 	container_name: DB-postgres
