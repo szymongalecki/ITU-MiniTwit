@@ -288,5 +288,4 @@ GUARD & RUN
 """
 
 if __name__ == "__main__":
-    delete_all_rows()
     uvicorn.run("minitwit_api_2:app", host="0.0.0.0", port=8080, reload=True)
