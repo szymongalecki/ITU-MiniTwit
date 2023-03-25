@@ -269,7 +269,7 @@ def post_follow_unfollow_user(
         user_id = get_user_id(f_u.unfollow)
         user_not_found(user_id)
         query = """
-                DELETE FROM public.follower 
+                DELETE FROM public.follower
                 WHERE who_id = (%s) and WHOM_ID = (%s)
                 """
     parameters = (follower_id, user_id)
