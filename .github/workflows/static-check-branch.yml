@@ -4,8 +4,8 @@ name: Static check
 on:
   push:
     branches:
-    - '**'
-    - '!main
+      - '**'
+      - '!main
 
 jobs:
   build:
