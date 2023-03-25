@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 
 
 """
-CONFIGURATION 
+CONFIGURATION
 """
 
 app = FastAPI()
@@ -20,7 +20,7 @@ LATEST = 0
 
 
 """
-DATA MODELS 
+DATA MODELS
 """
 
 
@@ -46,7 +46,7 @@ class Follow_Unfollow(BaseModel):
 
 
 """
-HELPER FUNCTIONS 
+HELPER FUNCTIONS
 """
 
 
@@ -90,8 +90,8 @@ def execute_query(query: str, parameters: Tuple) -> list | None:
 def get_user_id(username: str) -> int | HTTPException:
     """Returns user_id if username exists in database"""
     query = """
-            SELECT user_id 
-            FROM user 
+            SELECT user_id
+            FROM user
             WHERE username = ?
             """
     parameters = (username,)
@@ -121,8 +121,8 @@ def get_messages(latest: int, no: int = LIMIT) -> list[Tweet]:
     update_latest(latest)
     limit = no if no else LIMIT
     query = """
-            SELECT message.text, message.pub_date, user.username 
-            FROM message, user 
+            SELECT message.text, message.pub_date, user.username
+            FROM message, user
             WHERE message.flagged = 0 AND
             user.user_id = message.author_id
             ORDER BY message.pub_date DESC LIMIT ?
@@ -143,8 +143,8 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
     limit = no if no else LIMIT
     user_id = get_user_id(username)
     query = """
-            SELECT message.text, message.pub_date, user.username 
-            FROM message, user 
+            SELECT message.text, message.pub_date, user.username
+            FROM message, user
             WHERE message.flagged = 0 AND
             user.user_id = message.author_id AND user.user_id = ?
             ORDER BY message.pub_date DESC LIMIT ?
@@ -159,9 +159,7 @@ def get_user_messages(username: str, latest: int, no: int = LIMIT) -> list[Tweet
 
 
 @app.get("/fllws/{username}", status_code=200)
-def get_user_followers(
-    username: str, latest: int, no: int = LIMIT
-) -> dict[str, list[str]]:
+def get_user_followers(username: str, latest: int, no: int = LIMIT) -> dict[str, list[str]]:
     """Returns followers of a given user"""
     update_latest(latest)
     limit = no if no else LIMIT
@@ -181,7 +179,7 @@ def get_user_followers(
 
 
 """
-POST ENDPOINTS 
+POST ENDPOINTS
 """
 
 
@@ -199,7 +197,7 @@ def post_register_user(latest: int, user: User) -> None:
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
-            INSERT INTO user (username, email, pw_hash) 
+            INSERT INTO user (username, email, pw_hash)
             VALUES (?, ?, ?)
             """
     parameters = (user.username, user.email, generate_password_hash(user.pwd))
@@ -226,14 +224,14 @@ def post_follow_unfollow_user(username: str, latest: int, f_u: Follow_Unfollow) 
     follower = get_user_id(username)
     if f_u.follow:
         user = get_user_id(f_u.follow)
-        query = """ 
-                INSERT INTO follower (who_id, whom_id) 
-                VALUES (?, ?) 
+        query = """
+                INSERT INTO follower (who_id, whom_id)
+                VALUES (?, ?)
                 """
     else:
         user = get_user_id(f_u.unfollow)
         query = """
-                DELETE FROM follower 
+                DELETE FROM follower
                 WHERE who_id=? and WHOM_ID=?
                 """
     parameters = (follower, user)
@@ -248,7 +246,7 @@ os.system(f"rm {DATABASE}")
 init_db()
 
 """
-GUARD & RUN 
+GUARD & RUN
 """
 
 if __name__ == "__main__":
