@@ -165,8 +165,8 @@ def get_user_messages(
     user_id = get_user_id(username)
     user_not_found(user_id)
     query = """
-            SELECT public.message.text, public.message.pub_date, public.user.username 
-            FROM public.message, public.user 
+            SELECT public.message.text, public.message.pub_date, public.user.username
+            FROM public.message, public.user
             WHERE public.message.flagged = False AND
             public.user.id = public.message.author_id AND public.user.id = (%s)
             ORDER BY public.message.pub_date DESC LIMIT (%s)
@@ -261,9 +261,9 @@ def post_follow_unfollow_user(
     if f_u.follow:
         user_id = get_user_id(f_u.follow)
         user_not_found(user_id)
-        query = """ 
-                INSERT INTO public.follower (who_id, whom_id) 
-                VALUES (%s, %s) 
+        query = """
+                INSERT INTO public.follower (who_id, whom_id)
+                VALUES (%s, %s)
                 """
     else:
         user_id = get_user_id(f_u.unfollow)
