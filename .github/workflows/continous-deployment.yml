@@ -31,7 +31,7 @@ jobs:
           pip install -r ./ITU_MiniTwit/requirements.txt
           pip install -r ./Minitwit-api/requirements.txt
 
-       - name: Run Flake8
+      - name: Run Flake8
         run: |
           flake8
         continue-on-error: true
