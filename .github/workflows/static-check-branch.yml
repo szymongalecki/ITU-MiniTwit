@@ -3,8 +3,9 @@ name: Static check
 
 on:
   push:
-    pull_request:
-    branches: [main]
+    branches:
+    - '**'
+    - '!main
 
 jobs:
   build:
