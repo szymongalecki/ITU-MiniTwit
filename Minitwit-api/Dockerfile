@@ -20,4 +20,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 # Run the API when the container is started, on port 8080, defined in minitwit_api.py
-CMD ["sh", "-c", "python minitwit_api.py"]
+CMD ["sh", "-c", "python minitwit_api_2.py"]
