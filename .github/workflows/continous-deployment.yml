@@ -36,6 +36,9 @@ jobs:
           black .
         continue-on-error: false
 
+      - name: Show Black changes
+        run: git diff
+        
       - name: Run Flake8
         run: |
           flake8
