@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Bandit
         run: |
-          bandit -r . --configfile bandit.yml --severity=HIGH
+          bandit -r . --configfile bandit.yml --severity=high
         continue-on-error: true
 
       - name: Run Black
