@@ -8,7 +8,7 @@ def copy_messages(apps, schema_editor):
 
     # Execute a SELECT statement to retrieve the data from the old table
     with old_db.cursor() as cursor:
-        cursor.execute("SELECT * FROM message")
+        cursor.execute("SELECT * FROM message limit 100")
 
         # Iterate over the rows and insert them into the new table
         for row in cursor.fetchall():
@@ -32,7 +32,7 @@ def copy_followers(apps, schema_editor):
 
     # Execute a SELECT statement to retrieve the data from the old table
     with old_db.cursor() as cursor:
-        cursor.execute("SELECT * FROM follower")
+        cursor.execute("SELECT * FROM follower limit 100")
 
         # Iterate over the rows and insert them into the new table
         for row in cursor.fetchall():

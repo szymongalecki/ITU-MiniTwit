@@ -19,7 +19,7 @@ def copy_users(apps, schema_editor):
             # Copy the relevant data from the old table to the new table
             new_user = newUser()
 
-            new_user.id = row[0]
+            # new_user.id = row[0]
             new_user.password = row[3]
             new_user.email = row[2]
             new_user.username = row[1]
