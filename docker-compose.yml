@@ -1,0 +1,41 @@
+# Passwords are explicit, for tests only, do not use for production :)
+version: '3'
+services:
+  postgres:
+    image: postgres
+    container_name: DB-postgres
+    restart: always
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    container_name: DB-postgres-interface
+    restart: always
+    ports:
+      - 8082:8080
+
+  api:
+    build: ./Minitwit-api
+    container_name: API
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+
+  app:
+    build: ./ITU_MiniTwit
+    container_name: APP
+    depends_on:
+      - postgres
+    ports:
+      - 8000:8000
+
+volumes:
+  postgres_volume:
