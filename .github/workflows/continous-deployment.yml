@@ -48,6 +48,7 @@ jobs:
       #     cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache,mode=max
 
       - name: Run MiniTwit test
+        context: ./ITU_MiniTwit
         run: |
           docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile .
           docker run --rm $DOCKER_USERNAME/minitwittest
