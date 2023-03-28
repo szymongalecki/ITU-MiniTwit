@@ -54,6 +54,7 @@ jobs:
           docker run --rm $DOCKER_USERNAME/minitwittest
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        continue-on-error: false
 
       #- name: Build and push sqlite database
       #  uses: docker/build-push-action@v2
