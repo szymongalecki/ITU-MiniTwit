@@ -12,7 +12,7 @@ class UserCreationFormTest(TestCase):
         }
 
         form = CustomUserCreationForm(data)
-
+        self.assertTrue(False)
         self.assertTrue(form.is_valid())
 
 class UserChangeFormTest(TestCase):
