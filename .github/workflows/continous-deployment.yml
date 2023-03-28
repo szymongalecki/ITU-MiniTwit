@@ -48,11 +48,11 @@ jobs:
       #     cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache,mode=max
 
       - name: Run MiniTwit test
-       run: |
-         docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile .
-         docker run --rm $DOCKER_USERNAME/minitwittest
-       env:
-         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile .
+          docker run --rm $DOCKER_USERNAME/minitwittest
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
       #- name: Build and push sqlite database
       #  uses: docker/build-push-action@v2
