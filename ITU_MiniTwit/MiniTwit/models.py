@@ -7,12 +7,16 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password
+from werkzeug.security import generate_password_hash
 
 
 class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True, null=False)
     email = models.EmailField(unique=True, null=False)
-    
+    def set_password(self, raw_password):
+        # Use your own hash function here instead of make_password
+        self.password = generate_password_hash(raw_password)
     class Meta:
         db_table = 'user'
 

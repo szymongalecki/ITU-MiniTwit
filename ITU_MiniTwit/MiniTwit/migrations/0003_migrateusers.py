@@ -13,7 +13,6 @@ def copy_users(apps, schema_editor):
 
         # Iterate over the rows and insert them into the new table
         for row in cursor.fetchall():
-            #print(row)
             newUser = apps.get_model('MiniTwit', 'User')
 
             # Copy the relevant data from the old table to the new table

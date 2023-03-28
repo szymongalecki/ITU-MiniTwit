@@ -1,10 +1,12 @@
+import datetime
 import time
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth import logout, login
 
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CustomLoginForm
 from .models import Message, User, Follower
 
 def timeline(request):
@@ -13,7 +15,7 @@ def timeline(request):
         follower = Follower.objects.filter(who_id = user.id).values_list('whom_id')
         messages = Message.objects.filter(author_id__in = follower).order_by('-pub_date')
         paginator = Paginator(messages, 10)  # 10 messages per page
-
+        view = "profile_user_timeline"
         page = request.GET.get('page')
         try:
             messages_page = paginator.page(page)
@@ -27,6 +29,7 @@ def timeline(request):
     else:
         return public_timeline(request)
     context = {
+        "profile_user":user,
         "view":view,
         "messages":messages,
         "user":user,
@@ -55,6 +58,7 @@ def public_timeline(request):
         messages_page = paginator.page(paginator.num_pages)
 
     context = {
+        "profile_user":user,
         "view":view,
         "messages":messages,
         "user":user,
@@ -83,11 +87,22 @@ def user_profile_timeline(request, pk):
     } 
     return render(request, 'MiniTwit/timeline.html', context)
 
-def login(request):
-    return render(request, 'registration/login.html', {})
+def index_login(request):
+    if request.method == 'POST':
+        form = CustomLoginForm(request=request, data=request.POST)
+        if form.is_valid():
+            profile_user = form.user_cache
+            login(request, user = profile_user)
+            return redirect('/')
+    else:
+        form = CustomLoginForm()
+    
+    context = {'form': form}
+    return render(request, 'registration/login.html', context)
 
-def logout(request):
-    return render(request, 'registration/login.html', {})
+def index_logout(request):
+    logout(request)
+    return redirect('/login')
 
 def follow_user(request, pk):
     user = User.objects.get(id=request.user.id)
@@ -104,7 +119,7 @@ def unfollow_user(request, pk):
 
 def add_message(request):
     user = User.objects.get(id=request.user.id)
-    message = Message(author_id = request.user.id, text = request.POST.get('text',''), pub_date = int(time.time()))
+    message = Message(author_id = request.user.id, text = request.POST.get('text',''), pub_date=datetime.datetime.fromtimestamp(time.time()))
     message.save()
     return timeline(request)
 
