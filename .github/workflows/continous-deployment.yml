@@ -49,13 +49,11 @@ jobs:
 
 
       - name: Run MiniTwit test
-        with:
-          context: ./ITU_MiniTwit
-          run: |
-            docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile .
-            docker run --rm $DOCKER_USERNAME/minitwittest
-          env:
-            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile ./ITU_MiniTwit
+          docker run --rm $DOCKER_USERNAME/minitwittest
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
       #- name: Build and push sqlite database
       #  uses: docker/build-push-action@v2
