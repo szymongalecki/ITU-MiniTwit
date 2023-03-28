@@ -37,6 +37,23 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
 
+      # - name: Build MiniTwit test
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: ./ITU_MiniTwit
+      #     file: ./ITU_MiniTwit/TestingDockerfile
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_USERNAME }}/minitwittest:latest
+      #     cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache
+      #     cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache,mode=max
+
+      - name: Run MiniTwit test
+        run: |
+          docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile .
+          docker run --rm $DOCKER_USERNAME/minitwittest
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
       #- name: Build and push sqlite database
       #  uses: docker/build-push-action@v2
       #  with:

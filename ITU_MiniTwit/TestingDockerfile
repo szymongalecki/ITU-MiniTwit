@@ -1,0 +1,21 @@
+# Build image:      `docker build --tag minitwit/app .`
+# Run container:    `docker run --rm -p 8000:8000 minitwit/app`
+
+# Parent image from which we are building
+FROM python:3.10-alpine
+
+# Set the working directory
+WORKDIR /usr/src
+
+# Update Python package manager, PIP
+RUN pip install --upgrade pip
+
+# Copy Python code, requirements, assets and !!! sqlite3 database !!! to the working directory
+COPY . /usr/src
+
+# Install needed Python packages using PIP
+RUN pip install -r requirements.txt
+
+# Run testing using manage.py
+RUN python manage.py test MiniTwit/tests
+
