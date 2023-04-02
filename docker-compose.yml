@@ -2,19 +2,13 @@
 version: '3'
 services:
   postgres:
-    image: postgres
+    build: ./Database
     container_name: DB-postgres
     restart: always
     volumes:
       - postgres_volume:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5432:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -33,23 +27,9 @@ services:
       - postgres
     ports:
       - 8080:8080
-
   app:
     build: ./ITU_MiniTwit
     container_name: APP
-    command: >
-      sh -c "
-            python manage.py migrate MiniTwit 0001_user_model && 
-            python manage.py migrate MiniTwit 0002_message_model && 
-            python manage.py migrate MiniTwit 0003_migrateusers && 
-            python manage.py migrate MiniTwit 0004_migratemessages &&
-            python manage.py migrate &&
-            python manage.py runserver 0.0.0.0:8000"
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST: postgres
     depends_on:
       postgres:
         condition: service_healthy
