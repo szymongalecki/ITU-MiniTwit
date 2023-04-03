@@ -1,5 +1,5 @@
 **Author: Dagmara Przygocka**
-### What is the choice of virtualization techniques and deployment targets?
+### What is the choice of three static analysis tools ?
 
 For the Mini Twit project the team decided to use the following linter tools:
 - Flake8: 
