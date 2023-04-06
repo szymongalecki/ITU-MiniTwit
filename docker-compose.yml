@@ -2,7 +2,7 @@
 version: '3'
 services:
   postgres:
-    image: ${DOCKER_USERNAME}/minitwitdatabase
+    image: ${DOCKER_USERNAME}/minitwitdb
     container_name: DB-postgres
     restart: always
     volumes:
