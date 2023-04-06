@@ -37,17 +37,6 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
 
-      # - name: Build MiniTwit test
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./ITU_MiniTwit
-      #     file: ./ITU_MiniTwit/TestingDockerfile
-      #     push: true
-      #     tags: ${{ secrets.DOCKER_USERNAME }}/minitwittest:latest
-      #     cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache
-      #     cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwittest:webbuildcache,mode=max
-
-
       - name: Run MiniTwit test
         run: |
           docker build -t $DOCKER_USERNAME/minitwittest -f ./ITU_MiniTwit/TestingDockerfile ./ITU_MiniTwit
@@ -56,15 +45,15 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         continue-on-error: true
 
-      #- name: Build and push sqlite database
-      #  uses: docker/build-push-action@v2
-      #  with:
-      #    context: .
-      #    file: ./Dockerfile-sqlite
-      #    push: true
-      #    tags: ${{ secrets.DOCKER_USERNAME }}/sqliteimage:latest
-      #    cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/sqliteimage:sqlitebuildcache
-      #    cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/sqliteimage:sqlitebuildcache,mode=max
+      - name: Build and push postgres database
+        uses: docker/build-push-action@v2
+        with:
+          context: ./Database
+          file: ./Database/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitdb:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitdb:postgresbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitdb:postgresbuildcache,mode=max
 
       - name: Build and push minitwit-api
         uses: docker/build-push-action@v2
