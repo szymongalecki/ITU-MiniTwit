@@ -30,6 +30,14 @@ services:
   app:
     build: ./ITU_MiniTwit
     container_name: APP
+    command: >
+      sh -c "
+            python manage.py runserver 0.0.0.0:8000"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: DB-postgres
     depends_on:
       postgres:
         condition: service_healthy
