@@ -1,14 +1,50 @@
-version: '3.3'
-
+# Passwords are explicit, for tests only, do not use for production :)
+version: '3'
 services:
+  postgres:
+    image: ${DOCKER_USERNAME}/minitwitdatabase
+    container_name: DB-postgres
+    restart: always
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
-  minitwitimage:
-    image: ${DOCKER_USERNAME}/minitwitimage
-    container_name: minitwit
+  adminer:
+    image: adminer
+    container_name: DB-postgres-interface
+    restart: always
     ports:
-        - '8000:8000'
-  minitwitapi:
+      - 8082:8080
+
+  api:
     image: ${DOCKER_USERNAME}/apiminitwit
-    container_name: minitwitapi
+    container_name: API
+    depends_on:
+      - postgres
     ports:
-        - '8001:8080'
+      - 8080:8080
+  app:
+    image: ${DOCKER_USERNAME}/minitwitimage
+    container_name: APP
+    command: >
+      sh -c "
+            python manage.py runserver 0.0.0.0:8000"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: DB-postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - 8000:8000
+    links:
+      - postgres
+
+volumes:
+  postgres_volume:
