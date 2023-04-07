@@ -32,6 +32,21 @@ It's important to note that **0003_migrateusers.py** and **0004_migratemessages.
 
 To run the migrations, we can use the **python manage.py migrate** command followed by the app label and the migration file name. For example, to run the **0003_migrateusers.py migration**, we would use the following command:
 
-`python manage.py migrate MiniTwit 0003_migrateusers.py`
+```python manage.py migrate MiniTwit 0003_migrateusers.py```
 
 By running the migrations in the correct order, we can ensure that the database schema is updated correctly and all necessary data is migrated.
+
+## Steps to restore the Data with an existing DB
+```
+docker exec -it <appContainerId> sh
+kill 1
+docker start <appContainerId>
+docker exec -it <appContainerId>
+rm MiniTwit/migrations/0003_migrateusers.py MiniTwit/migrations/0004_migratemessages.py
+python manager.py migrate --fake
+exit 
+docker cp MiniTwit/migrations/0003_migrateusers.py <appContainerId>:/usr/src/MiniTwit/migrations
+docker cp MiniTwit/migrations/0004_migratemessages.py <appContainerId>:/usr/src/MiniTwit/migrations
+docker exec -it <appContainerId>
+python manager.py magrate
+```
