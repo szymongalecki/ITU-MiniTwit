@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.urls import reverse
+from django.utils import timezone
 
 from MiniTwit.models import User, Message, Follower
 
@@ -16,8 +16,9 @@ class MessageListViewTest(TestCase):
 
         for message_id in range(5):
             Message.objects.create(
-                author_id=user1,
+                author=user1,
                 text=f'message {message_id}',
+                pub_date=timezone.now()
             )
                 
     def test_public_timeline_reponse(self):
@@ -37,18 +38,17 @@ class MessageListViewTest(TestCase):
         user1 = User.objects.get(username="testuser1")
         user2 = User.objects.get(username="testuser2")
         self.client.get('/testuser2/follow')
-        follower = Follower.objects.get(who_id=user1)
-        self.assertEqual(follower.whom_id,user2)
+        follower = Follower.objects.get(who=user1)
+        self.assertEqual(follower.whom,user2)
 
     def test_unfollow(self):
         self.client.login(username='testuser1', password='test123!')
         user1 = User.objects.get(username="testuser1")
         user2 = User.objects.get(username="testuser2")
         self.client.get('/testuser2/follow')
-        follower = Follower.objects.get(who_id=user1)
-        self.assertEqual(follower.whom_id,user2)
+        follower = Follower.objects.get(who=user1)
+        self.assertEqual(follower.whom,user2)
         self.client.get('/testuser2/unfollow')
-        follower = Follower.objects.filter(who_id=user1)
+        follower = Follower.objects.filter(who=user1)
         self.assertEqual(not follower, True)
-
 
