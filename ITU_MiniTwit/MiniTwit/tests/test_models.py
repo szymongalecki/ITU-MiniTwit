@@ -1,5 +1,6 @@
 from django.test import TestCase
 from MiniTwit.models import User, Follower, Message
+from django.utils import timezone
 
 class UserTestCase(TestCase):
     def setUp(self):
@@ -30,47 +31,47 @@ class FollowerTestCase(TestCase):
         user1 = User.objects.get(username="testuser1")
         user2 = User.objects.get(username="testuser2")
 
-        Follower.objects.create(who_id=user1, whom_id=user2)
-        Follower.objects.create(who_id=user2, whom_id=user1)
+        Follower.objects.create(who=user1, whom=user2)
+        Follower.objects.create(who=user2, whom=user1)
 
-    def test_who_id(self):
+    def test_who(self):
         user1 = User.objects.get(username="testuser1")
         user2 = User.objects.get(username="testuser2")
 
-        follower1 = Follower.objects.get(who_id=user1)
-        follower2 = Follower.objects.get(who_id=user2)
+        follower1 = Follower.objects.get(who=user1)
+        follower2 = Follower.objects.get(who=user2)
 
-        self.assertEqual(follower1.whom_id, user1)
-        self.assertEqual(follower2.whom_id, user2)
+        self.assertEqual(follower1.whom, user1)
+        self.assertEqual(follower2.whom, user2)
 
 
-    def test_who_id(self):
+    def test_who(self):
         user1 = User.objects.get(username="testuser1")
         user2 = User.objects.get(username="testuser2")
 
-        follower1 = Follower.objects.get(whom_id=user1)
-        follower2 = Follower.objects.get(whom_id=user2)
+        follower1 = Follower.objects.get(whom=user1)
+        follower2 = Follower.objects.get(whom=user2)
 
-        self.assertEqual(follower1.who_id, user2)
-        self.assertEqual(follower2.who_id, user1)
+        self.assertEqual(follower1.who, user2)
+        self.assertEqual(follower2.who, user1)
 
 class MessageTestCase(TestCase):
     def setUp(self):
         User.objects.create(username="testuser", email="testuser@gmail.com")
         user = User.objects.get(username="testuser")
-        Message.objects.create(author_id=user,text="hello twitter")
+        Message.objects.create(author=user,text="hello twitter",pub_date=timezone.now())
         
-    def test_author_id(self):
+    def test_author(self):
         user = User.objects.get(username="testuser")
-        message = Message.objects.get(author_id=user)
-        self.assertEqual(message.author_id, user)
+        message = Message.objects.get(author=user)
+        self.assertEqual(message.author, user)
 
     def test_text(self):
         user = User.objects.get(username="testuser")
-        message = Message.objects.get(author_id=user)
+        message = Message.objects.get(author=user)
         self.assertEqual(message.text, "hello twitter")
 
     def test_flagged(self):
         user = User.objects.get(username="testuser")
-        message = Message.objects.get(author_id=user)
+        message = Message.objects.get(author=user)
         self.assertEqual(message.flagged, False)
