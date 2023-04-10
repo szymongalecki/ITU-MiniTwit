@@ -50,3 +50,19 @@ docker cp MiniTwit/migrations/0004_migratemessages.py <appContainerId>:/usr/src/
 docker exec -it <appContainerId>
 python manager.py magrate
 ```
+## How to copy the data
+On the receiving side (the side that is listening on the port), run the following command:
+```
+nc -l [port] > [filename]
+```
+This will start listening on the specified port and redirect the incoming data to the specified filename.
+
+On the sending side, run the following command:
+```
+nc [ip address] [port] < [filename]
+```
+This will send the contents of the specified file to the specified IP address and port using nc.
+
+Make sure to replace [port], [ip address], and [filename] with the appropriate values.
+
+Note that this method is not encrypted, so if security is a concern, you should use a different method that provides encryption, such as scp. Also, this method does not compress the files, so it may be slower for large files or over slow network connections.
