@@ -10,8 +10,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import make_password
 from werkzeug.security import generate_password_hash
 
-
-
 class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True, null=False)
     email = models.EmailField(unique=True, null=False)
