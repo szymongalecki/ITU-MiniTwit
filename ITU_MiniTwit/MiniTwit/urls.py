@@ -1,7 +1,7 @@
 from django.urls import include, path
 from .views import *
 
-app_name = 'crm'
+app_name = "crm"
 
 urlpatterns = [
     path('', timeline, name="timeline"),

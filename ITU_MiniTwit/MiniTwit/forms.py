@@ -9,12 +9,13 @@ class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(max_length=254, required=True, widget=forms.TextInput)
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}))
 
+class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
 
-class CustomUserChangeForm(UserChangeForm):
 
+class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ("username", "email")

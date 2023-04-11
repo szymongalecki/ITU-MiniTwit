@@ -9,6 +9,7 @@ from django.contrib.auth import logout, login
 from .forms import CustomUserCreationForm, CustomLoginForm
 from .models import Message, User, Follower
 
+
 def timeline(request):
     if request.user.is_authenticated:
         user = User.objects.get(id=request.user.id)
@@ -79,13 +80,14 @@ def user_profile_timeline(request, pk):
         user = None
         followed = False
     context = {
-        "profile_user":profile_user,
-        "view":"profile_user_timeline",
-        "messages":messages,
-        "user":user,
-        "followed":followed
-    } 
-    return render(request, 'MiniTwit/timeline.html', context)
+        "profile_user": profile_user,
+        "view": "profile_user_timeline",
+        "messages": messages,
+        "user": user,
+        "followed": followed,
+    }
+    return render(request, "MiniTwit/timeline.html", context)
+
 
 def index_login(request):
     if request.method == 'POST':
@@ -111,17 +113,20 @@ def follow_user(request, pk):
     following.save()
     return user_profile_timeline(request, profile_user.username)
 
+
 def unfollow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
     Follower.objects.filter(who = user.id, whom = profile_user.id).delete()
     return user_profile_timeline(request, profile_user.username)
 
+
 def add_message(request):
     user = User.objects.get(id=request.user.id)
     message = Message(author = user, text = request.POST.get('text',''), pub_date=datetime.datetime.fromtimestamp(time.time()))
     message.save()
     return timeline(request)
+
 
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm

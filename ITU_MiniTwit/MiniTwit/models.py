@@ -19,6 +19,7 @@ class User(AbstractUser):
     class Meta:
         db_table = 'user'
 
+
 class Follower(models.Model):
     who = models.ForeignKey(User, related_name='who', on_delete=models.CASCADE, null=True)
     whom = models.ForeignKey(User, related_name='whom', on_delete=models.CASCADE, null=True)

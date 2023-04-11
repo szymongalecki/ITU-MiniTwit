@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 import psycopg2
 
 """
-CONFIGURATION 
+CONFIGURATION
 """
 
 app = FastAPI()
@@ -16,7 +16,7 @@ LATEST = 0
 
 
 """
-DATA MODELS 
+DATA MODELS
 """
 
 
@@ -42,7 +42,7 @@ class Follow_Unfollow(BaseModel):
 
 
 """
-HELPER FUNCTIONS 
+HELPER FUNCTIONS
 """
 
 
@@ -164,8 +164,8 @@ def get_user_messages(
     user_id = get_user_id(username)
     user_not_found(user_id)
     query = """
-            SELECT public.message.text, public.message.pub_date, public.user.username 
-            FROM public.message, public.user 
+            SELECT public.message.text, public.message.pub_date, public.user.username
+            FROM public.message, public.user
             WHERE public.message.flagged = False AND
             public.user.id = public.message.author_id AND public.user.id = (%s)
             ORDER BY public.message.pub_date DESC LIMIT (%s)
@@ -202,7 +202,7 @@ def get_user_followers(
 
 
 """
-POST ENDPOINTS 
+POST ENDPOINTS
 """
 
 
@@ -214,7 +214,7 @@ def post_register_user(latest: int, user: User) -> None:
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
-            INSERT INTO public.user (username, email, password, date_joined, first_name, last_name, is_superuser, is_staff, is_active) 
+            INSERT INTO public.user (username, email, password, date_joined, first_name, last_name, is_superuser, is_staff, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
     parameters = (
@@ -260,15 +260,15 @@ def post_follow_unfollow_user(
     if f_u.follow:
         user_id = get_user_id(f_u.follow)
         user_not_found(user_id)
-        query = """ 
-                INSERT INTO public.follower (who_id, whom_id) 
-                VALUES (%s, %s) 
+        query = """
+                INSERT INTO public.follower (who_id, whom_id)
+                VALUES (%s, %s)
                 """
     else:
         user_id = get_user_id(f_u.unfollow)
         user_not_found(user_id)
         query = """
-                DELETE FROM public.follower 
+                DELETE FROM public.follower
                 WHERE who_id = (%s) and WHOM_ID = (%s)
                 """
     parameters = (follower_id, user_id)
@@ -283,7 +283,7 @@ INITIALISE DATABASE / DELETE ALL ROWS
 # delete_all_rows()
 
 """
-GUARD & RUN 
+GUARD & RUN
 """
 
 if __name__ == "__main__":
