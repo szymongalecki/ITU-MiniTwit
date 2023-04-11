@@ -17,10 +17,10 @@
         This is you!
       {% elif followed %}
         You are currently following this user.
-        <a class="unfollow" href="{% url 'MiniTwit:unfollow-user' profile_user.username %}">Unfollow user</a>.
+        <a class="unfollow" href="{% url 'unfollow-user' profile_user.username %}">Unfollow user</a>.
       {% else %}
         You are not yet following this user.
-        <a class="follow" href="{% url 'MiniTwit:follow-user' profile_user.username %}">Follow user</a>.
+        <a class="follow" href="{% url 'follow-user' profile_user.username %}">Follow user</a>.
       {% endif %}
       </div>
     {% else %}
@@ -35,15 +35,29 @@
     {% endif %}
   {% endif %}
   <ul class=messages>
-  {% if messages %}
-  {% for message in messages %}
-    <li><img src="{{ message.email }}"><p>
-      <strong><a href="{% url 'MiniTwit:user-profile-timeline' message.author_id %}">{{ message.author_id }}</a></strong>
-      {{ message.text }}
-      <small>&mdash; {{ message.pub_date }}</small>
-  {% endfor %}
-  {% else %}
-    <li><em>There's no message so far.</em>
-  {% endif %}
+    {% for message in messages_page %}
+      <li><img src="{{ message.email }}"><p>
+        <strong><a href="{% url 'MiniTwit:user-profile-timeline' message.author_id %}">{{ message.author.username }}</a></strong>
+        {{ message.text }}
+        <small>&mdash; {{ message.pub_date }}</small>
+    {% endfor %}
   </ul>
+  <div class="pagination">
+    <span class="step-links">
+        {% if messages_page.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ messages_page.previous_page_number }}">previous</a>
+        {% endif %}
+  
+        <span class="current-page">
+            Page {{ messages_page.number }} of {{ messages_page.paginator.num_pages }}.
+        </span>
+  
+        {% if messages_page.has_next %}
+            <a href="?page={{ messages_page.next_page_number }}">next</a>
+            <a href="?page={{ messages_page.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+  </div>
+  
 {% endblock %}

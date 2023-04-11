@@ -84,7 +84,6 @@ def connect_db():
         user="postgres",
         password="postgres",
         host="DB-postgres",
-        port="5432",
     )
 
 
