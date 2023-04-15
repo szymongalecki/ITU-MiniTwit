@@ -5,14 +5,19 @@ from typing import Tuple
 import uvicorn
 from werkzeug.security import generate_password_hash
 import psycopg2
+from prometheus_fastapi_instrumentator import Instrumentator
+
 
 """
 CONFIGURATION
 """
 
+
 app = FastAPI()
 LIMIT = 100
 LATEST = 0
+
+Instrumentator().instrument(app).expose(app)
 
 
 """
