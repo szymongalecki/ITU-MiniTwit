@@ -2,7 +2,8 @@
 version: '3'
 services:
   postgres:
-    image: ${DOCKER_USERNAME}/minitwitdb
+    # image: ${DOCKER_USERNAME}/minitwitdb
+    build: ./Database
     container_name: DB-postgres
     restart: always
     volumes:
@@ -21,14 +22,16 @@ services:
       - 8082:8080
 
   api:
-    image: ${DOCKER_USERNAME}/apiminitwit
+    # image: ${DOCKER_USERNAME}/apiminitwit
+    build: ./Minitwit-api
     container_name: API
     depends_on:
       - postgres
     ports:
       - 8080:8080
   app:
-    image: ${DOCKER_USERNAME}/minitwitimage
+    # image: ${DOCKER_USERNAME}/minitwitimage
+    build: ./ITU_MiniTwit
     container_name: APP
     command: >
       sh -c "
@@ -45,6 +48,19 @@ services:
       - 8000:8000
     links:
       - postgres
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_volume:
