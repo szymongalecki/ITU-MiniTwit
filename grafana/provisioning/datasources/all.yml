@@ -7,3 +7,4 @@ datasources:
    type: 'prometheus'
    url: 'http://prometheus:9090'
    version: 1
+   uid: 'prometheus'

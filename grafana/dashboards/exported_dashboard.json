@@ -31,7 +31,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "E2loy5EVk"
+                "uid": "prometheus"
             },
             "fieldConfig": {
                 "defaults": {
@@ -114,7 +114,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_requests_total{handler=\"/msgs/{username}\"}",
@@ -126,7 +126,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_response_size_bytes_count{handler=\"/msgs/{username}\"}",
@@ -142,7 +142,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "E2loy5EVk"
+                "uid": "prometheus"
             },
             "description": "",
             "fieldConfig": {
@@ -226,7 +226,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_requests_total{handler=\"/fllws/{username}\"}",
@@ -238,7 +238,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_response_size_bytes_count{handler=\"/fllws/{username}\"}",
@@ -254,7 +254,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "E2loy5EVk"
+                "uid": "prometheus"
             },
             "fieldConfig": {
                 "defaults": {
@@ -337,7 +337,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_requests_total{handler=\"/register\"}",
@@ -349,7 +349,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "http_response_size_bytes_count{handler=\"/register\"}",
@@ -365,7 +365,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "E2loy5EVk"
+                "uid": "prometheus"
             },
             "fieldConfig": {
                 "defaults": {
@@ -444,7 +444,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "E2loy5EVk"
+                        "uid": "prometheus"
                     },
                     "editorMode": "builder",
                     "expr": "prometheus_ready",
