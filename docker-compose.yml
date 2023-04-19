@@ -2,8 +2,7 @@
 version: '3'
 services:
   postgres:
-    # image: ${DOCKER_USERNAME}/minitwitdb
-    build: ./Database
+    image: ${DOCKER_USERNAME}/minitwitdb
     container_name: DB-postgres
     restart: always
     volumes:
@@ -22,16 +21,14 @@ services:
       - 8082:8080
 
   api:
-    # image: ${DOCKER_USERNAME}/apiminitwit
-    build: ./Minitwit-api
+    image: ${DOCKER_USERNAME}/apiminitwit
     container_name: API
     depends_on:
       - postgres
     ports:
       - 8080:8080
   app:
-    # image: ${DOCKER_USERNAME}/minitwitimage
-    build: ./ITU_MiniTwit
+    image: ${DOCKER_USERNAME}/minitwitimage
     container_name: APP
     command: >
       sh -c "
