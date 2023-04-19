@@ -457,7 +457,7 @@
             "type": "timeseries"
         }
     ],
-    "refresh": "",
+    "refresh": "5s",
     "revision": 1,
     "schemaVersion": 38,
     "style": "dark",
@@ -466,7 +466,7 @@
         "list": []
     },
     "time": {
-        "from": "now-1h",
+        "from": "now-5m",
         "to": "now"
     },
     "timepicker": {},
