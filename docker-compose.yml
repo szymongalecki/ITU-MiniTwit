@@ -55,7 +55,7 @@ services:
       - "9090:9090"
 
   grafana:
-    build: ./grafana
+    image: szymongalecki/grafana
     container_name: grafana
     ports:
       - "3000:3000"
