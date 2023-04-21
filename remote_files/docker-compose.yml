@@ -58,7 +58,7 @@ services:
     image: szymongalecki/grafana
     container_name: grafana
     ports:
-      - "5003:5003"
+      - "5003:3000"
 
 volumes:
   postgres_volume:
