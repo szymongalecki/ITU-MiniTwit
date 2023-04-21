@@ -5,14 +5,19 @@ from typing import Tuple
 import uvicorn
 from werkzeug.security import generate_password_hash
 import psycopg2
+from prometheus_fastapi_instrumentator import Instrumentator
+
 
 """
 CONFIGURATION
 """
 
+
 app = FastAPI()
 LIMIT = 100
 LATEST = 0
+
+Instrumentator().instrument(app).expose(app)
 
 
 """
@@ -51,24 +56,7 @@ def authenticate_simulator(request: Request) -> None | HTTPException:
         "Authorization" not in request.headers
         or "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh" != request.headers["Authorization"]
     ):
-        raise HTTPException(
-            status_code=403, detail="You are not authorized to use this resource!"
-        )
-
-
-def initialise_db() -> None:
-    """Creates the database tables"""
-    with open("minitwit_schema.sql", "r") as f:
-        post_query(f.read(), ())
-
-
-def delete_all_rows() -> None:
-    query = """
-            DELETE FROM public.follower;
-            DELETE FROM public.message;
-            DELETE FROM public.user;
-            """
-    post_query(query, ())
+        raise HTTPException(status_code=403, detail="You are not authorized to use this resource!")
 
 
 def update_latest(latest: int) -> None:
@@ -155,9 +143,7 @@ def get_messages(request: Request, latest: int, no: int = LIMIT) -> list[Tweet]:
 
 
 @app.get("/msgs/{username}", status_code=200)
-def get_user_messages(
-    request: Request, username: str, latest: int, no: int = LIMIT
-) -> list[Tweet]:
+def get_user_messages(request: Request, username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages of a given user"""
     update_latest(latest)
     authenticate_simulator(request)
@@ -232,9 +218,7 @@ def post_register_user(latest: int, user: User) -> None:
 
 
 @app.post("/msgs/{username}", status_code=204)
-def post_user_messages(
-    request: Request, username: str, latest: int, message: Message
-) -> None:
+def post_user_messages(request: Request, username: str, latest: int, message: Message) -> None:
     """Posts message as a given user"""
     update_latest(latest)
     authenticate_simulator(request)
@@ -274,13 +258,6 @@ def post_follow_unfollow_user(
     parameters = (follower_id, user_id)
     post_query(query, parameters)
 
-
-"""
-INITIALISE DATABASE / DELETE ALL ROWS
-"""
-
-# initialise_db()
-# delete_all_rows()
 
 """
 GUARD & RUN
