@@ -200,7 +200,9 @@ def post_register_user(latest: int, user: User) -> None:
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
-            INSERT INTO public.user (username, email, password, date_joined, first_name, last_name, is_superuser, is_staff, is_active)
+            INSERT INTO public.user
+            (username, email, password, date_joined, first_name,
+            last_name, is_superuser, is_staff, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
     parameters = (
