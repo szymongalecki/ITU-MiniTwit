@@ -44,4 +44,4 @@ jobs:
       - name: Run Bandit
         run: |
           bandit -r . --configfile bandit.yml --severity=high
-        continue-on-error: true
+        continue-on-error: false
