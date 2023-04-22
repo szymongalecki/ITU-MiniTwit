@@ -1,0 +1,18 @@
+# Match the client IP address and port
+IP_PORT %{IP:client_ip}:%{NUMBER:client_port}
+
+# Match the HTTP method
+HTTPMETHOD %{WORD:http_method}
+
+# Match the request URI
+HTTPURI %{WORD:request_uri}
+
+# Match the HTTP version
+HTTPVERSION HTTP/%{NUMBER:http_version}
+
+# Match the HTTP status code
+HTTPSTATUS %{NUMBER:http_status}
+
+# Combine the patterns to create the log pattern
+LOG %{WORD:log_level}: %{IP_PORT} - "%{HTTPMETHOD} %{HTTPURI} %{HTTPVERSION}" %{HTTPSTATUS}
+
