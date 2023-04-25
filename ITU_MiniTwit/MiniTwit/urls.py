@@ -1,7 +1,7 @@
 from django.urls import include, path
 from .views import *
 
-app_name = "crm"
+app_name = "minitwit"
 
 urlpatterns = [
     path('', timeline, name="timeline"),

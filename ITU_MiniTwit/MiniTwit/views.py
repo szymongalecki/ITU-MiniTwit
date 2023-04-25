@@ -16,7 +16,6 @@ def timeline(request):
         follower = Follower.objects.filter(who = user.id).values_list('whom')
         messages = Message.objects.filter(author__in = follower).order_by('-pub_date')
         paginator = Paginator(messages, 10)  # 10 messages per page
-        view = "profile_user_timeline"
         page = request.GET.get('page')
         try:
             messages_page = paginator.page(page)
@@ -31,7 +30,7 @@ def timeline(request):
         return public_timeline(request)
     context = {
         "profile_user":user,
-        "view":view,
+        "view":"my_timeline",
         "messages":messages,
         "user":user,
         'messages_page': messages_page
@@ -79,12 +78,27 @@ def user_profile_timeline(request, pk):
     else:
         user = None
         followed = False
+
+    paginator = Paginator(messages, 10)  # 10 messages per page
+
+    page = request.GET.get('page')
+    try:
+        messages_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        messages_page = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        messages_page = paginator.page(paginator.num_pages)
+
     context = {
         "profile_user": profile_user,
         "view": "profile_user_timeline",
         "messages": messages,
         "user": user,
         "followed": followed,
+        'messages_page': messages_page
+
     }
     return render(request, "MiniTwit/timeline.html", context)
 
@@ -111,14 +125,14 @@ def follow_user(request, pk):
     profile_user = User.objects.get(username=pk)
     following = Follower(who = user, whom = profile_user)
     following.save()
-    return user_profile_timeline(request, profile_user.username)
+    return user_profile_timeline(request, profile_user.id)
 
 
 def unfollow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
     Follower.objects.filter(who = user.id, whom = profile_user.id).delete()
-    return user_profile_timeline(request, profile_user.username)
+    return user_profile_timeline(request, profile_user.id)
 
 
 def add_message(request):
