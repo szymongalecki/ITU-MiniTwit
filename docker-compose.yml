@@ -48,12 +48,12 @@ services:
       - postgres
 
   prometheus:
-    image: prom/prometheus
+    # built on apple sillicon, needs to be rebuild to run in droplet
+    image: szymongalecki/prometheus
     container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
+    # correct architecture, runs in droplet, can be forked
     image: szymongalecki/grafana
     container_name: grafana
     ports:
