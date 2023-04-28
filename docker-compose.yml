@@ -1,8 +1,8 @@
-# Passwords are explicit, for tests only, do not use for production :)
+# THIS IS A LOCAL 'docker-compose' FILE FOR LOCAL BUILDS AND TESTS
 version: '3'
 services:
   postgres:
-    image: ${DOCKER_USERNAME}/minitwitdb
+    build: ./Database
     container_name: DB-postgres
     restart: always
     volumes:
@@ -26,7 +26,7 @@ services:
       - main
 
   api:
-    image: ${DOCKER_USERNAME}/apiminitwit
+    build: ./Minitwit-api
     container_name: API
     depends_on:
       - postgres
@@ -36,7 +36,7 @@ services:
       - main
 
   app:
-    image: ${DOCKER_USERNAME}/minitwitimage
+    build: ./ITU_MiniTwit
     container_name: APP
     command: >
       sh -c "
@@ -101,18 +101,16 @@ services:
         target: /etc/nginx/.htpasswd
 
   prometheus:
-    image: prom/prometheus
+    # built on apple sillicon, needs to be rebuild to run in droplet
+    image: szymongalecki/prometheus
     container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
 
   grafana:
+    # correct architecture, runs in droplet, can be forked
     image: szymongalecki/grafana
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "5003:3000"
 
 volumes:
   postgres_volume:

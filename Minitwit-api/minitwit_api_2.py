@@ -123,7 +123,7 @@ def get_latest() -> dict[str, int]:
 
 
 @app.get("/msgs", status_code=200)
-def get_messages(request: Request, latest: int, no: int = LIMIT) -> list[Tweet]:
+def get_messages(request: Request, latest: int = -1, no: int = LIMIT) -> list[Tweet]:
     """Returns the latest messages"""
     update_latest(latest)
     authenticate_simulator(request)
@@ -143,7 +143,9 @@ def get_messages(request: Request, latest: int, no: int = LIMIT) -> list[Tweet]:
 
 
 @app.get("/msgs/{username}", status_code=200)
-def get_user_messages(request: Request, username: str, latest: int, no: int = LIMIT) -> list[Tweet]:
+def get_user_messages(
+    request: Request, username: str, latest: int = -1, no: int = LIMIT
+) -> list[Tweet]:
     """Returns the latest messages of a given user"""
     update_latest(latest)
     authenticate_simulator(request)
@@ -166,7 +168,7 @@ def get_user_messages(request: Request, username: str, latest: int, no: int = LI
 
 @app.get("/fllws/{username}", status_code=200)
 def get_user_followers(
-    request: Request, username: str, latest: int, no: int = LIMIT
+    request: Request, username: str, latest: int = -1, no: int = LIMIT
 ) -> dict[str, list[str]]:
     """Returns followers of a given user"""
     update_latest(latest)
@@ -193,14 +195,16 @@ POST ENDPOINTS
 
 
 @app.post("/register", status_code=204)
-def post_register_user(latest: int, user: User) -> None:
+def post_register_user(user: User, latest: int = -1) -> None:
     update_latest(latest)
     if get_user_id(user.username) is not None:
         raise HTTPException(status_code=400, detail="The username is already taken")
     if "@" not in user.email:
         raise HTTPException(status_code=400, detail="Provided email has no @")
     query = """
-            INSERT INTO public.user (username, email, password, date_joined, first_name, last_name, is_superuser, is_staff, is_active)
+            INSERT INTO public.user
+            (username, email, password, date_joined, first_name,
+            last_name, is_superuser, is_staff, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
     parameters = (
@@ -218,7 +222,7 @@ def post_register_user(latest: int, user: User) -> None:
 
 
 @app.post("/msgs/{username}", status_code=204)
-def post_user_messages(request: Request, username: str, latest: int, message: Message) -> None:
+def post_user_messages(request: Request, username: str, message: Message, latest: int = -1) -> None:
     """Posts message as a given user"""
     update_latest(latest)
     authenticate_simulator(request)
@@ -234,7 +238,7 @@ def post_user_messages(request: Request, username: str, latest: int, message: Me
 
 @app.post("/fllws/{username}", status_code=204)
 def post_follow_unfollow_user(
-    request: Request, username: str, latest: int, f_u: Follow_Unfollow
+    request: Request, username: str, f_u: Follow_Unfollow, latest: int = -1
 ) -> None:
     """Follows or unfollows user for another given user"""
     update_latest(latest)

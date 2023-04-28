@@ -2,7 +2,7 @@
 version: '3'
 services:
   postgres:
-    image: ${DOCKER_USERNAME}/minitwitdatabase
+    image: ${DOCKER_USERNAME}/minitwitdb
     container_name: DB-postgres
     restart: always
     volumes:
@@ -45,6 +45,16 @@ services:
       - 8000:8000
     links:
       - postgres
+
+  prometheus:
+    image: petrastm/prometheus
+    container_name: prometheus
+
+  grafana:
+    image: petrastm/grafana
+    container_name: grafana
+    ports:
+      - "5003:3000"
 
 volumes:
   postgres_volume:
