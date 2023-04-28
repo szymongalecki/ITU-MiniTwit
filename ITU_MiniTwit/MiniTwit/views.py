@@ -5,7 +5,6 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import logout, login
-
 from .forms import CustomUserCreationForm, CustomLoginForm
 from .models import Message, User, Follower
 from django.views.decorators.http import require_POST, require_GET
@@ -27,7 +26,6 @@ def timeline(request):
         except EmptyPage:
             # If page is out of range, deliver last page of results.
             messages_page = paginator.page(paginator.num_pages)
-            view = "timeline"
     else:
         return public_timeline(request)
     context = {
@@ -143,7 +141,7 @@ def follow_user(request, pk):
 def unfollow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
-    Follower.objects.filter(who = user.id, whom = profile_user.id).delete()
+    Follower.objects.filter(who=user.id, whom=profile_user.id).delete()
     return user_profile_timeline(request, profile_user.id)
 
 
