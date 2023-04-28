@@ -1,6 +1,7 @@
 from django.urls import path
 from django.views.generic.base import RedirectView
-from .views import *
+from .views import SignUpView, add_message, user_profile_timeline, follow_user, unfollow_user
+from .views import timeline, public_timeline, index_login, index_logout
 
 app_name = "minitwit"
 
