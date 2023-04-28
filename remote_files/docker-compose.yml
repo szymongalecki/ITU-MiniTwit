@@ -47,13 +47,11 @@ services:
       - postgres
 
   prometheus:
-    image: prom/prometheus
+    image: petrastm/prometheus
     container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
-    image: szymongalecki/grafana
+    image: petrastm/grafana
     container_name: grafana
     ports:
       - "5003:3000"
