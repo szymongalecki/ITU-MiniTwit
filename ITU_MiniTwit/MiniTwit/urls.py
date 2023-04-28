@@ -1,10 +1,13 @@
 from django.urls import path
+from django.views.generic.base import RedirectView
 from .views import SignUpView, add_message, user_profile_timeline, follow_user, unfollow_user
 from .views import timeline, public_timeline, index_login, index_logout
-app_name = "crm"
+
+app_name = "minitwit"
 
 urlpatterns = [
     path('', timeline, name="timeline"),
+    path("favicon.ico/", RedirectView.as_view(url='/static/favicon.ico', permanent=True), name="favicon.ico"),
     path('public/', public_timeline, name="public-timeline"),
     path('login/', index_login, name="login"),
     path('logout/', index_logout, name="logout"),
