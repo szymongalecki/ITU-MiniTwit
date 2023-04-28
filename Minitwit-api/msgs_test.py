@@ -14,7 +14,7 @@ ENCODED_CREDENTIALS = base64.b64encode(CREDENTIALS).decode()
 HEADERS = {
     "Connection": "close",
     "Content-Type": "application/json",
-    f"Authorization": f"Basic {ENCODED_CREDENTIALS}",
+    "Authorization": f"Basic {ENCODED_CREDENTIALS}",
 }
 
 
