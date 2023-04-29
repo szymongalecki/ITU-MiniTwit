@@ -96,6 +96,26 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi,mode=max
 
+      - name: Build and push grafana
+        uses: docker/build-push-action@v2
+        with:
+          context: ./grafana
+          file: ./grafana/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/grafana:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi,mode=max
+
+      - name: Build and push prometheus
+        uses: docker/build-push-action@v2
+        with:
+          context: ./prometheus
+          file: ./prometheus/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/prometheus:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/prometheus:webbuildcacheapi
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/prometheus:webbuildcacheapi,mode=max      
+
       #- name: Test minitwit
       #  run: |
       #    docker build -t $DOCKER_USERNAME/minitwittestimage -f Dockerfile-minitwit-tests .
