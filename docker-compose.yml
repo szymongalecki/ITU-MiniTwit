@@ -15,7 +15,6 @@ services:
     networks:
       - main
 
-
   adminer:
     image: adminer
     container_name: DB-postgres-interface
@@ -74,45 +73,34 @@ services:
         - elk
 
   filebeat:
-    image: "docker.elastic.co/beats/filebeat:7.2.0"
-    user: root
+    build: ./filebeat
     volumes:
-        - ${ELK_DIR}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
         - /var/lib/docker:/var/lib/docker:ro
         - /var/run/docker.sock:/var/run/docker.sock
     networks:
         - elk
           
   nginx: 
-    image: nginx
+    build: ./nginx
     ports:
       - 9200:9200
       - 5000:5601
-      - 8881:8881
-      - 8882:8882
     networks:
       - elk
-    volumes:
-      - type: bind
-        source: ${ELK_DIR}/nginx.conf
-        target: /etc/nginx/nginx.conf
-      - type: bind
-        source: ${ELK_DIR}/.htpasswd
-        target: /etc/nginx/.htpasswd
 
   prometheus:
     # built on apple sillicon, needs to be rebuild to run in droplet
-    image: szymongalecki/prometheus
+    build: ./prometheus
     container_name: prometheus
     networks:
       - main
 
   grafana:
     # correct architecture, runs in droplet, can be forked
-    image: szymongalecki/grafana
+    build: ./grafana
     container_name: grafana
     ports:
-      - "5003:3000"   
+      - "5003:3000"
     networks:
       - main
 
