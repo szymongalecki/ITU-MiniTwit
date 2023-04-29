@@ -56,14 +56,14 @@ services:
       - main
 
   prometheus:
-    image: petrastm/prometheus
+    image: ${DOCKER_USERNAME}/prometheus
     container_name: prometheus
     networks:
       - main
 
 
   grafana:
-    image: petrastm/grafana
+    image: ${DOCKER_USERNAME}/grafana
     container_name: grafana
     ports:
       - "5003:3000"
@@ -88,7 +88,7 @@ services:
         - elk
 
   filebeat:
-    image: petrastm/filebeat
+    image: ${DOCKER_USERNAME}/filebeat
     volumes:
         - /var/lib/docker:/var/lib/docker:ro
         - /var/run/docker.sock:/var/run/docker.sock
@@ -96,7 +96,7 @@ services:
         - elk
           
   nginx: 
-    image: petrastm/nginx
+    image: ${DOCKER_USERNAME}/nginx
     ports:
       - 9200:9200
       - 5000:5601
