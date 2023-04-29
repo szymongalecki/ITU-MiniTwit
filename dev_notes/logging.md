@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-**Filebeat**
-
-=======
 **Author: Petraula Stamou and Dagmara Przygocka**
 
 # ELK
@@ -13,7 +9,6 @@ Overall, using EFK for Docker logging can significantly improve the manageabilit
 
 
 ## Filebeat
->>>>>>> 102b32c80f108dfae9a83c1836f76be3b3648676
 Filebeat is a lightweight data shipping agent that is used for forwarding and centralizing log data. It is part of the Elastic Stack, which also includes Elasticsearch, Logstash, and Kibana, and it is designed to work seamlessly with the other components of the stack. Filebeat is used to collect log data from various sources and forward it to a central location, such as Elasticsearch, where it can be indexed and analyzed.
 
 Filebeat supports a variety of input types, including log files, system logs, and application logs, and it can be configured to tail and forward logs in real-time. It also supports a range of output destinations, including Elasticsearch, Logstash, Kafka, and Redis.
@@ -24,41 +19,24 @@ We configured Filebeat to collect logs from all Docker containers in the /var/li
 
 Additionally, we configured the output destination to send the processed logs to Elasticsearch running at elasticsearch:9200. We have defined three index templates based on the container image names: one for the Filebeat container itself, one for two specific container images (API and APP), and one for an Nginx container.
 
-<<<<<<< HEAD
-Finally we enabled JSON logging format for Filebeat logs and disabled metrics logging for Filebeat.
-=======
 We also enabled JSON logging format for Filebeat logs and disabled metrics logging for Filebeat.
 
 Finally, the following volumes are mounted to the Filebeat container:
 
 **/var/lib/docker:/var/lib/docker:ro** - mounts the Docker host's /var/lib/docker directory to allow Filebeat to collect logs from Docker containers.
 **/var/run/docker.sock:/var/run/docker.sock** - mounts the Docker host's Docker socket to allow Filebeat to communicate with the Docker API.
->>>>>>> 102b32c80f108dfae9a83c1836f76be3b3648676
 
 Overall, this configuration will allow us to collect and centralize log data from multiple Docker containers in a structured and organized way, making it easier to analyze and troubleshoot issues in our system.
 
 In the next section we explain the steps in more details.
 
-<<<<<<< HEAD
-**Dockerfile**
-=======
 ### Dockerfile
->>>>>>> 102b32c80f108dfae9a83c1836f76be3b3648676
 
 1. We are using the official Docker image for Filebeat version 7.2.0 from Elastic.co.
 2. we are using root user to allow copying of the filebeat.yml file to the appropriate directory.
 3. Then we copy the filebeat.yml file from the host system to the appropriate directory inside the Docker container.
 4. FInally, with CMD ["filebeat", "-e"] command we set the default command to execute when the Docker container starts. In this case, it is the "filebeat" binary with the "-e" flag, which tells Filebeat to log output to the standard error.
 
-<<<<<<< HEAD
-**filebeat.yml**
-
-1. filebeat.inputs: This section specifies the input sources for Filebeat to collect logs from.
-2. processors: This section specifies the processing steps to apply to the collected logs.
-3. output.elasticsearch: This section specifies the output destination for the processed logs.
-4. logging.json: true: This setting enables JSON logging format for Filebeat logs.
-5. logging.metrics.enabled: false: This setting disables metrics logging for Filebeat.
-=======
 ### filebeat.yml
 
 1. **filebeat.inputs**: This section specifies the input sources for Filebeat to collect logs from.
@@ -133,4 +111,3 @@ The .htpasswd file contains a single user (the one requested for this assingment
 Finally, the docker-compose.yml file we specify that ports 9200 and 5601 should be exposed. These ports are then mapped to the same ports on the host machine, allowing you to access Elasticsearch and Kibana through the nginx reverse proxy.
 
 Overall, this setup provides a secure way to access Elasticsearch and Kibana through a single entry point with authentication.
->>>>>>> 102b32c80f108dfae9a83c1836f76be3b3648676
