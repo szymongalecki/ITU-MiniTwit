@@ -35,3 +35,41 @@ In the next section we explain the steps in more details.
 3. output.elasticsearch: This section specifies the output destination for the processed logs.
 4. logging.json: true: This setting enables JSON logging format for Filebeat logs.
 5. logging.metrics.enabled: false: This setting disables metrics logging for Filebeat.
+
+## kibana
+Kibana is a data visualization and exploration tool designed to work with Elasticsearch. 
+
+The steps to set it up using the kibana dashboard are:
+- create index pattern
+    - define index pattern
+	![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/index_pattern.png)
+    - configure settings
+    ![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/configure_settings.png)
+
+
+Next based on the discover tab create visualizations. The team decided to have:
+- total number of logs
+- logs per api, app in general
+- api logs per level
+- api logs per request
+- logs per day for api
+- number of log levels: error, info, debug, warn
+
+In order to have the same visualization set up as the production the following steps have to be taken:
+- in production kibana dashboard (url) go to Management tab
+- under Kibana section go to Saved Objects
+- mark the objects you want to export to your local environment
+- export file with .ndjson extension
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/export_kibana.png)
+- navigate to your local kibana dashboard to Saved Objects and import the file with .ndjson extension
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_import.png)
+- go to dashboard or visualization and you will see imported objects, search patterns that you can reuse
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_dashboard.png)
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_discover.png)
+![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_visualization.png)
+
+
+
+
+
+
