@@ -1,4 +1,7 @@
-# Filebeat
+**Author: Petraula Stamou and Dagmara Przygocka**
+# ELK
+
+## Filebeat
 
 Filebeat is a lightweight data shipping agent that is used for forwarding and centralizing log data. It is part of the Elastic Stack, which also includes Elasticsearch, Logstash, and Kibana, and it is designed to work seamlessly with the other components of the stack. Filebeat is used to collect log data from various sources and forward it to a central location, such as Elasticsearch, where it can be indexed and analyzed.
 
