@@ -12,6 +12,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - main
 
   adminer:
     image: adminer
@@ -19,6 +21,8 @@ services:
     restart: always
     ports:
       - 8082:8080
+    networks:
+      - main
 
   api:
     build: ./Minitwit-api
@@ -27,6 +31,8 @@ services:
       - postgres
     ports:
       - 8080:8080
+    networks:
+      - main
 
   app:
     build: ./ITU_MiniTwit
@@ -46,18 +52,64 @@ services:
       - 8000:8000
     links:
       - postgres
+    networks:
+      - main
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
+    environment:
+        - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+        - "discovery.type=single-node"
+    volumes:
+        - elk-elasticsearch-volume:/usr/share/elasticsearch/data
+    networks:
+        - elk
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:7.2.0"
+    environment:
+        elasticsearch.hosts: '["http://elasticsearch:9200"]'
+    networks:
+        - elk
+
+  filebeat:
+    build: ./filebeat
+    volumes:
+        - /var/lib/docker:/var/lib/docker:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+        - elk
+          
+  nginx: 
+    build: ./nginx
+    ports:
+      - 9200:9200
+      - 5000:5601
+    networks:
+      - elk
 
   prometheus:
     # built on apple sillicon, needs to be rebuild to run in droplet
-    image: szymongalecki/prometheus
+    build: ./prometheus
     container_name: prometheus
+    networks:
+      - main
 
   grafana:
     # correct architecture, runs in droplet, can be forked
-    image: szymongalecki/grafana
+    build: ./grafana
     container_name: grafana
     ports:
       - "5003:3000"
+    networks:
+      - main
 
 volumes:
   postgres_volume:
+  elk-elasticsearch-volume:
+
+networks:
+  main:
+    name: itu-minitwit-network
+  elk:
+    name: elk-network
