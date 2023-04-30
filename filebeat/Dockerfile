@@ -1,4 +1,4 @@
-FROM docker.elastic.co/beats/filebeat:7.2.0
+FROM docker.elastic.co/beats/filebeat:7.17.1
 USER root
 COPY filebeat.yml /usr/share/filebeat/filebeat.yml
-CMD ["filebeat", "-e"]
+CMD ["filebeat", "-e", "-strict.perms=false"]
