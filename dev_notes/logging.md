@@ -46,7 +46,7 @@ In the next section we explain the steps in more details.
 5. **logging.metrics.enabled**: false: This setting disables metrics logging for Filebeat.
 
 
-## kibana
+## Kibana
 Kibana is a data visualization and exploration tool designed to work with Elasticsearch. 
 
 The steps to set it up using the kibana dashboard are:
@@ -99,7 +99,7 @@ The Elasticsearch container is configured with a volume:
 **"elk-elasticsearch-volume:/usr/share/elasticsearch/data"**: Mounts the "elk-elasticsearch-volume" volume to the "/usr/share/elasticsearch/data" directory inside the Elasticsearch container. This allows Elasticsearch to store its data on the host system, so that it can be persisted across container restarts.
 
 
-# nginx
+## Nginx
 
 Nginx is a high-performance web server that can also be used as a reverse proxy, load balancer, and HTTP cache. In this context, it is being used as a reverse proxy for Elasticsearch and Kibana, with authentication enabled via an .htpasswd file.
 
