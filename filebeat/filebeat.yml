@@ -13,7 +13,7 @@ processors:
     overwrite_keys: true
 
 output.elasticsearch:
-  hosts: ["http://138.68.73.127:9200", elasticsearch:9200"]\
+  hosts: ["elasticsearch:9200"]
   username: "helgeandmircea"
   password: "sesame0uvr3toi"
   indices:
