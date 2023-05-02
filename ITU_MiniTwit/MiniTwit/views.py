@@ -128,7 +128,7 @@ def index_logout(request):
     return redirect('/login')
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def follow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
@@ -137,7 +137,7 @@ def follow_user(request, pk):
     return user_profile_timeline(request, profile_user.id)
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def unfollow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
