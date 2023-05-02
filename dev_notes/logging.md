@@ -111,3 +111,5 @@ The .htpasswd file contains a single user (the one requested for this assingment
 Finally, the docker-compose.yml file we specify that ports 9200 and 5601 should be exposed. These ports are then mapped to the same ports on the host machine, allowing you to access Elasticsearch and Kibana through the nginx reverse proxy.
 
 Overall, this setup provides a secure way to access Elasticsearch and Kibana through a single entry point with authentication.
+
+NOTES: The logging can be accessed here: http://138.68.73.127:5000/app/home with credentials provided by the teacher
