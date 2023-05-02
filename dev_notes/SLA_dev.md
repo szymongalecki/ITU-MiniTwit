@@ -1,6 +1,7 @@
 #SLA dev explanation
 ## Service Availability
 We will measure/monitor service availability by looking at the dashboards wich displays count of request/respopnse we get in the application. If there are not response/requests than we will knwo the application is down.
+
 ## Response Time
 We will measure average response time using grafana by running this query:
 ```
