@@ -52,17 +52,15 @@ Kibana is a data visualization and exploration tool designed to work with Elasti
 The steps to set it up using the kibana dashboard are:
 - create index pattern
     - define index pattern
-	![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/index_pattern.png)
+	![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/index_pattern.png)
     - configure settings
-    ![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/configure_settings.png)
+    ![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/configure_settings.png)
 
 
 Next based on the discover tab create visualizations. The team decided to have:
-- total number of logs
-- logs per api, app in general
-- api logs per level
-- api logs per request
-- logs per day for api
+- total number of logs per container
+- logs per api,app and general
+- amount of requests per method (post, get, delete)
 - number of log levels: error, info, debug, warn
 
 In order to have the same visualization set up as the production the following steps have to be taken:
@@ -70,13 +68,13 @@ In order to have the same visualization set up as the production the following s
 - under Kibana section go to Saved Objects
 - mark the objects you want to export to your local environment
 - export file with .ndjson extension
-![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/export_kibana.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/export_kibana.png)
 - navigate to your local kibana dashboard to Saved Objects and import the file with .ndjson extension
-![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_import.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/kibana_import.png)
 - go to dashboard or visualization and you will see imported objects, search patterns that you can reuse
-![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_dashboard.png)
-![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_discover.png)
-![](https://raw.githubusercontent.com/szymongalecki/ITU-MiniTwit/composing/dev_notes/kibana_visualization.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/kibana_dashboard.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/kibana_discover.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/kibana_visualization.png)
 
 
 ## Elasticsearch
