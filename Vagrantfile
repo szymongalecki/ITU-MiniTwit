@@ -34,7 +34,8 @@ Vagrant.configure("2") do |config|
       # "s": This is the size class, which typically refers to the level of resources allocated to the instance.
       # "1vcpu": This specifies the number of virtual CPUs allocated to the instance, which in this case is one.
       # "1gb": This specifies the amount of memory allocated to the instance, which in this case is one gigabyte.
-      provider.size = 's-1vcpu-1gb'
+      # 2 cpu 4GB
+      provider.size = 's-2vcpu-4gb'
     end
     # sets the hostname of the virtual machine.
     server.vm.hostname = "minitwit-ci-server"
@@ -68,6 +69,11 @@ Vagrant.configure("2") do |config|
     ufw allow 5432 && \
     ufw allow 8082 && \
     ufw allow 8080 && \
+    ufw allow 5601 && \
+    ufw allow 9200 && \
+    ufw allow 6767 && \
+    ufw allow 9090 && \
+    ufw allow 3000 && \
     ufw allow 22/tcp
 
     echo ". $HOME/.bashrc" >> $HOME/.bash_profile
