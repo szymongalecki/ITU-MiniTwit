@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import logout, login
 from .forms import CustomUserCreationForm, CustomLoginForm
 from .models import Message, User, Follower
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
 
 
 @require_GET
@@ -107,7 +107,7 @@ def user_profile_timeline(request, pk):
     return render(request, "MiniTwit/timeline.html", context)
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def index_login(request):
     if request.method == 'POST':
         form = CustomLoginForm(request=request, data=request.POST)
@@ -122,13 +122,13 @@ def index_login(request):
     return render(request, 'registration/login.html', context)
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def index_logout(request):
     logout(request)
     return redirect('/login')
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def follow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
@@ -137,7 +137,7 @@ def follow_user(request, pk):
     return user_profile_timeline(request, profile_user.id)
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def unfollow_user(request, pk):
     user = User.objects.get(id=request.user.id)
     profile_user = User.objects.get(username=pk)
