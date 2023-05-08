@@ -10,7 +10,7 @@ from .models import Message, User, Follower
 from django.views.decorators.http import require_GET, require_http_methods
 
 
-@require_GET
+@require_http_methods(["GET", "POST"])
 def timeline(request):
     if request.user.is_authenticated:
         user = User.objects.get(id=request.user.id)
