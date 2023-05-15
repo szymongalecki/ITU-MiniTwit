@@ -8,13 +8,10 @@ import pytest
 
 GUI_URL = "http://0.0.0.0:8000/"
 
-def randomString(l):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=l))
+def randomString(length):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 test_tweet = randomString(5)
-
-def randomString(l):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=l))
 
 def setupDriver(subpage):
     options = Options()
