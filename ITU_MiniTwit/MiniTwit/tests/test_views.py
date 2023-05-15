@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.utils import timezone
-
+import os
 from MiniTwit.models import User, Message, Follower
 
-test_password = "test123!"
+test_password = os.environ.get("TEST_PASSWORD")
 public_page = "/public/"
 
 class MessageListViewTest(TestCase):

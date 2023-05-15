@@ -1,7 +1,8 @@
 from django.test import TestCase
 from MiniTwit.forms import CustomUserCreationForm, CustomUserChangeForm
+import os
 
-test_password = 'test123!'
+test_password = os.environ.get("TEST_PASSWORD")
 
 class UserCreationFormTest(TestCase):
 
