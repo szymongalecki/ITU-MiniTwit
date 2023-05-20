@@ -23,6 +23,7 @@ Vagrant.configure("2") do |config|
     sudo cp ../minitwit/master.sh /etc/keepalived/master.sh
     sudo chmod +x /etc/keepalived/master.sh
     sudo chmod +x /minitwit/check_containers.sh
+    sudo chmod +x /minitwit/check_services.sh
 
     # Start Keepalived service immediately
     keepalived -S 7 -f /etc/keepalived/keepalived.conf -D -n
