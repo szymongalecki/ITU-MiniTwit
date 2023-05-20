@@ -8,6 +8,7 @@ The current status of MiniTwit application includes running database service as 
 - Separating databases form the stack so all replicas could have one source of data.
 - Increasing Digital Ocean account resources so we could have more than 3 droplets.
 - Migrating the data from the initial server and deploying the replicas.
+- Research why keepalived is not executing master.sh script even though it registers the change of state from MASTER to BACKUP. (for now we have a workaround where we check if the state is master and than we check if it has assigned reserved ip, to other option is to ssh into the server stop keepalived and start it with command: "keepalived -S 7 -f /etc/keepalived/keepalived.conf -D -n". The command when run in vagrant works but freezes the execution and the file can not finish.)
 
 The current implementation involves 3 servers where:
 - The initial server containing the data collected during the simulation.
