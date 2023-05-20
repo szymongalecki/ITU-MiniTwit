@@ -1,1 +1,0 @@
-{"rsync":{"/minitwit":{"type":"rsync","guestpath":"/minitwit","hostpath":"C:/Users/daga1/Desktop/ITU/devops/ITU-MiniTwit/hot_server/remote_files","disabled":false,"__vagrantfile":true,"owner":"root","group":"root"}}}
