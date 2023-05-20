@@ -4,7 +4,7 @@
 container_count=$(docker ps --format '{{.ID}}' | wc -l)
 
 # Define the threshold for container count
-threshold=3
+threshold=10
 
 if [ "$container_count" -lt "$threshold" ]; then
     exit 1  # Return non-zero exit status to trigger switch

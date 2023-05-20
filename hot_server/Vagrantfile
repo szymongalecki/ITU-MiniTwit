@@ -11,7 +11,6 @@ Vagrant.configure("2") do |config|
 
   common_provision_script = <<-SCRIPT
     sudo apt-get update
-    sudo apt-get install -y nginx
 
     sudo apt-get install -y keepalived
 
@@ -67,7 +66,7 @@ Vagrant.configure("2") do |config|
     echo "cd /minitwit" >> ~/.bash_profile
 
     chmod +x /minitwit/deploy.sh
-    cd ./minitwit
+    cd /minitwit
     docker-compose -f docker-compose.yml up -d
 
     echo -e "\nVagrant setup done ..."
