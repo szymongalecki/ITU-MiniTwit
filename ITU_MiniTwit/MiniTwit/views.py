@@ -7,10 +7,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import logout, login
 from .forms import CustomUserCreationForm, CustomLoginForm
 from .models import Message, User, Follower
-from django.views.decorators.http import require_POST, require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods
 
 
-@require_GET
+@require_http_methods(["GET", "POST"])
 def timeline(request):
     if request.user.is_authenticated:
         user = User.objects.get(id=request.user.id)
@@ -145,7 +145,7 @@ def unfollow_user(request, pk):
     return user_profile_timeline(request, profile_user.id)
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def add_message(request):
     user = User.objects.get(id=request.user.id)
     message = Message(author=user, text=request.POST.get('text', ''),
