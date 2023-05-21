@@ -146,7 +146,7 @@ jobs:
 
       - name: Deploy to server1
         run: >
-          ssh $SSH_USER@$SSH_HOST_REPLICA1
+          ssh $SSH_USER@$SSH_HOST
           -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
@@ -155,18 +155,21 @@ jobs:
 
       - name: Wait for Services to be Up
         run: |
-          if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
+          if ssh $SSH_USER@$SSH_HOST \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
               exit 1
           fi
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST_REPLICA1 }}
         continue-on-error: false
       
       - name: Deploy to server2
         run: >
-          ssh $SSH_USER@$SSH_HOST_REPLICA2
+          ssh $SSH_USER@$SSH_HOST
           -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
@@ -175,12 +178,14 @@ jobs:
 
       - name: Wait for Services to be Up
         run: |
-          run: |
-          if ssh $SSH_USER@$SSH_HOST_REPLICA2 \
+          if ssh $SSH_USER@$SSH_HOST \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
               exit 1
           fi
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST_REPLICA2 }}
         continue-on-error: false
