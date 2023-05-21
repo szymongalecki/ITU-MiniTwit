@@ -176,7 +176,7 @@ jobs:
       - name: Wait for Services to be Up
         run: |
           run: |
-          if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
+          if ssh $SSH_USER@$SSH_HOST_REPLICA2 \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
