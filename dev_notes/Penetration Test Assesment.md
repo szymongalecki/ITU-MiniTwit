@@ -74,7 +74,7 @@
 
 
 4. Use a Risk Matrix to prioritize risk of scenarios
-![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/RiskMatrix.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/main/dev_notes/RiskMatrix.png)
 
 
 ## C. Pen-Test Your System
@@ -84,7 +84,7 @@ Next, we proceeded to execute the OWASP ZAP 2.12.0 tool on our website, which pr
 
 For the final phase, we conducted targeted attacks on our application using custom scripts and various scenarios, such as SQL injections and XSS attacks. Through this process, we identified a key vulnerability that demanded immediate attention: cross-site scripting attacks. To fortify our application, we implemented CSRF tokens in all forms susceptible to this vulnerability, thus enhancing the overall security of our app.
 
-![](https://github.com/szymongalecki/ITU-MiniTwit/blob/dprzygocka-patch-6/dev_notes/Alerts.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/main/dev_notes/Alerts.png)
 
 
 
