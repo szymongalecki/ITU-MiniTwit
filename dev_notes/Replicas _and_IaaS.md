@@ -8,7 +8,7 @@ The current status of MiniTwit application includes running database service as 
 - Separating databases form the stack so all replicas could have one source of data.
 - Increasing Digital Ocean account resources so we could have more than 3 droplets.
 - Migrating the data from the initial server and deploying the replicas.
-- Research why keepalived is not executing master.sh script even though it registers the change of state from MASTER to BACKUP. (for now we have ssh into the server stop keepalived and start it with again with command: "keepalived -S 7 -f /etc/keepalived/keepalived.conf -D -n". The command when run in vagrant works but freezes the execution and the file can not finish.)
+- Research why keepalived is not executing master.sh script even though it registers the change of state from MASTER to BACKUP. (for now we are starting the keepalived service, stop it and start it again in non-daemon mode.)
 
 The current implementation involves 3 servers where:
 - The initial server containing the data collected during the simulation.
@@ -31,14 +31,14 @@ To the backup:
 - Create keepalived folder
 - Copy keepalived.conf file from host machine to the guest machine from folder second
 - Run the common script
- The machines share a script that runs the same steps for both machines. The script:
+The machines share a script that runs the same steps for both machines. The script:
 - Updates the package lists for available software packages
 - Instals (with yes to any questions) keepalived package
 - Gets the assign-ip script , used for reassigning the reserved ip from main to backup server.
 - Instals (with yes to any questions) python3 package
 - Copies the master.sh form host server to /etc/keepalived/master.sh
 - Changes executable permissions for master.sh and check_containers.sh
-- Starts keepalived service
+- Starts keepalived service, stop and start it again non-daemon mode
 - Starts the docker-compose file for the machine
 The rest of the script is described in a file called virtualization_&_deployment_choice.md. 
 
