@@ -143,6 +143,11 @@ jobs:
           chmod 600 ~/.ssh/do_ssh_key
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
+          
+      - name: Check SSH key file
+        run: |
+          ls ~/.ssh/do_ssh_key
+        continue-on-error: true
 
       - name: Deploy to server1
         run: >
