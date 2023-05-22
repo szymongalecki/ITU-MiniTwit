@@ -74,7 +74,7 @@
 
 
 4. Use a Risk Matrix to prioritize risk of scenarios
-![](https://github.com/szymongalecki/ITU-MiniTwit/blob/main/dev_notes/RiskMatrix.png)
+![](https://github.com/szymongalecki/ITU-MiniTwit/blob/main/dev_notes/RistMatrix.png)
 
 
 ## C. Pen-Test Your System
