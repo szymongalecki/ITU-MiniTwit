@@ -146,7 +146,7 @@ jobs:
 
       - name: Deploy to server1
         run: >
-          ssh $SSH_USER@$SSH_HOST1
+          ssh -v $SSH_USER@$SSH_HOST1
           -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
@@ -155,7 +155,7 @@ jobs:
 
       - name: Wait for Services to be Up
         run: |
-          if ssh $SSH_USER@$SSH_HOST1 \
+          if ssh -v $SSH_USER@$SSH_HOST1 \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
@@ -169,7 +169,7 @@ jobs:
       
       - name: Deploy to server2
         run: >
-          ssh $SSH_USER@$SSH_HOST2
+          ssh -v $SSH_USER@$SSH_HOST2
           -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
@@ -178,7 +178,7 @@ jobs:
 
       - name: Wait for Services to be Up
         run: |
-          if ssh $SSH_USER@$SSH_HOST2 \
+          if ssh -v $SSH_USER@$SSH_HOST2 \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
