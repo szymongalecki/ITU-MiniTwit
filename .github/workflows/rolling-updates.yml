@@ -139,15 +139,15 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSH_KEY_" > ~/.ssh/do_ssh_key
-          chmod 600 ~/.ssh/do_ssh_key
+          echo "$SSH_KEY_SWARM" > ~/.ssh/swarm_key
+          chmod 600 ~/.ssh/swarm_key
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KEY_SWARM: ${{ secrets.SSH_KEY_SWARM }}
 
       - name: Deploy to server1
         run: >
           ssh $SSH_USER@$SSH_HOST_REPLICA1
-          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
+          -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -156,7 +156,7 @@ jobs:
       - name: Wait for Services to be Up
         run: |
           if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
-            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+            -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
@@ -167,7 +167,7 @@ jobs:
       - name: Deploy to server2
         run: >
           ssh $SSH_USER@$SSH_HOST_REPLICA2
-          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
+          -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -177,7 +177,7 @@ jobs:
         run: |
           run: |
           if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
-            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+            -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
