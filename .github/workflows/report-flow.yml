@@ -1,41 +1,23 @@
-name: LaTeX Build
-
+name: LaTeX document
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
+    paths:
+      - '/report'
+  workflow_dispatch:
 jobs:
-  build:
+  build_latex:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up LaTeX
+      - name: Set up Git repository
+        uses: actions/checkout@v3
+      - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
-          latexmk_use_xelatex: true
-          root_file: report/main.tex
-
-      - name: Copy LaTeX files
-        run: |
-          mkdir -p destination
-          cp report/main.tex destination/main.tex
-          cp -R report/images destination/images
-
-      - name: Compile LaTeX to PDF
-        run: |
-          cd destination
-          latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
-
-      - name: Move PDF to report directory
-        run: |
-          mv destination/main.pdf report/MSc_group_t.pdf
-
-      - name: Upload PDF artifact
-        uses: actions/upload-artifact@v2
+          working_directory: ./report
+          root_file: main.tex
+      - name: Upload PDF file
+        uses: actions/upload-artifact@v3
         with:
-          name: report-pdf
-          path: report/MSc_group_t.pdf
+          name: BS_group_j
+          path: ./report/main.pdf
