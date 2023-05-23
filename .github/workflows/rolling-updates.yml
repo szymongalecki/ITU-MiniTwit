@@ -187,6 +187,6 @@ jobs:
               exit 1
           fi
         env:
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
         continue-on-error: false
