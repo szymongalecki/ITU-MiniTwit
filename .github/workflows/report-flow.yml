@@ -17,6 +17,7 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           latexmk_use_xelatex: true
+          root_file: report/main.tex
 
       - name: Copy LaTeX files
         run: |
