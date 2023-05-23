@@ -147,6 +147,10 @@ jobs:
       - name: Check SSH key file
         run: |
           ls ~/.ssh/do_ssh_key
+        continue-on-error: true
+        
+      - name: Print SSH key file
+        run: |
           cat ~/.ssh/do_ssh_key
         continue-on-error: true
 
