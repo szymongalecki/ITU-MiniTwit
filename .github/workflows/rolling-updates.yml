@@ -147,6 +147,7 @@ jobs:
       - name: Check SSH key file
         run: |
           ls ~/.ssh/do_ssh_key
+          cat ~/.ssh/do_ssh_key
         continue-on-error: true
 
       - name: Deploy to server1
