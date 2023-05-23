@@ -13,32 +13,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # steps:
-    #   - name: Checkout
-    #     uses: actions/checkout@v2
-
-    #   - name: Set up LaTeX
-    #     uses: xu-cheng/latex-action@v2
-    #     with:
-    #       root_file: report/main.tex
-    #       continue_on_error: true
-          
-    #   - name: Compile LaTeX to PDF
-    #     run: |
-    #       cd report
-    #       pdflatex -interaction=nonstopmode main.tex
-
-    #   - name: Move PDF to report directory
-    #     run: |
-    #       mv report/main.pdf report/MSc_group_t.pdf
-
-    #   - name: Upload PDF artifact
-    #     uses: actions/upload-artifact@v2
-    #     with:
-    #       name: report-pdf
-    #       path: report/MSc_group_t.pdf
-
       - name: Checkout
         uses: actions/checkout@v2
 
