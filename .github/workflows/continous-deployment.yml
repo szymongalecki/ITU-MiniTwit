@@ -153,3 +153,16 @@ jobs:
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: latex2pdf
+        uses: thomas-chauvet/latex2pdf-action@1.0.5
+        with:
+          output_dir: report
+          main_latex_file: report/main.tex
+          ctan_packages: amsmath amsfonts lua-uni-algos
+     
+      - name: Upload PDF to the workflow tab
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: report/MSc_group_t.pdf
