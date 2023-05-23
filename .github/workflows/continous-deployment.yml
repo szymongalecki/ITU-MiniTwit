@@ -155,13 +155,15 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
 
       - name: latex2pdf
-        uses: thomas-chauvet/latex2pdf-action@1.0.5
+        id: compile-latex-document
+        uses: thomas-chauvet/latex2pdf-action@1.1.0
         with:
           output_dir: report
           main_latex_file: report/main.tex
           ctan_packages: amsmath amsfonts lua-uni-algos
      
       - name: Upload PDF to the workflow tab
+        id: upload-workflow-tab
         uses: actions/upload-artifact@v2
         with:
           name: report
