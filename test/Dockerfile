@@ -14,3 +14,5 @@ COPY . /usr/src
 RUN pip install -r requirements.txt
 
 RUN pytest test.py
+
+USER nonroot
