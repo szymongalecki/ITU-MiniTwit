@@ -151,7 +151,7 @@ jobs:
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST_REPLICA1 }}
+          SSH_HOST_REPLICA1: ${{ secrets.SSH_HOST_REPLICA1 }}
 
       - name: Wait for Services to be Up
         run: |
@@ -162,6 +162,9 @@ jobs:
           else
               exit 1
           fi
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST_REPLICA1: ${{ secrets.SSH_HOST_REPLICA1 }}
         continue-on-error: false
       
       - name: Deploy to server2
@@ -171,16 +174,19 @@ jobs:
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST_REPLICA2 }}
+          SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
 
       - name: Wait for Services to be Up
         run: |
           run: |
-          if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
+          if ssh $SSH_USER@$SSH_HOST_REPLICA2 \
             -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
               exit 1
           fi
+        env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
         continue-on-error: false
