@@ -21,7 +21,7 @@ jobs:
       - name: Set up LaTeX
         uses: xu-cheng/latex-action@v2
         with:
-          latex-version: 'TeXLive'
+          root_file: report/main.tex
           
       - name: Compile LaTeX to PDF
         run: |
