@@ -139,34 +139,24 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSH_KEY_" > ~/.ssh/do_ssh_key
-          chmod 600 ~/.ssh/do_ssh_key
+          echo "$SSH_KEY_SWARM" > ~/.ssh/swarm_key
+          chmod 600 ~/.ssh/swarm_key
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          
-      - name: Check SSH key file
-        run: |
-          ls ~/.ssh/do_ssh_key
-        continue-on-error: true
-        
-      - name: Print SSH key file
-        run: |
-          cat ~/.ssh/do_ssh_key
-        continue-on-error: true
+          SSH_KEY_SWARM: ${{ secrets.SSH_KEY_SWARM }}
 
       - name: Deploy to server1
         run: >
-          ssh -v $SSH_USER@$SSH_HOST1
-          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
+          ssh $SSH_USER@$SSH_HOST_REPLICA1
+          -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST1: ${{ secrets.SSH_HOST_REPLICA1 }}
+          SSH_HOST_REPLICA1: ${{ secrets.SSH_HOST_REPLICA1 }}
 
       - name: Wait for Services to be Up
         run: |
-          if ssh -v $SSH_USER@$SSH_HOST1 \
-            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+          if ssh $SSH_USER@$SSH_HOST_REPLICA1 \
+            -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
@@ -174,22 +164,23 @@ jobs:
           fi
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST1: ${{ secrets.SSH_HOST_REPLICA1 }}
+          SSH_HOST_REPLICA1: ${{ secrets.SSH_HOST_REPLICA1 }}
         continue-on-error: false
       
       - name: Deploy to server2
         run: >
-          ssh -v $SSH_USER@$SSH_HOST2
-          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
+          ssh $SSH_USER@$SSH_HOST_REPLICA2
+          -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no
           '/minitwit/deploy.sh'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST2: ${{ secrets.SSH_HOST_REPLICA2 }}
+          SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
 
       - name: Wait for Services to be Up
         run: |
-          if ssh -v $SSH_USER@$SSH_HOST2 \
-            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+          run: |
+          if ssh $SSH_USER@$SSH_HOST_REPLICA2 \
+            -i ~/.ssh/swarm_key -o StrictHostKeyChecking=no \
             '/minitwit/check_services.sh'; then
               exit 0
           else
@@ -197,5 +188,5 @@ jobs:
           fi
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST2: ${{ secrets.SSH_HOST_REPLICA2 }}
+          SSH_HOST_REPLICA2: ${{ secrets.SSH_HOST_REPLICA2 }}
         continue-on-error: false
