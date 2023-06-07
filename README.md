@@ -8,9 +8,9 @@ Project repository for "DevOps, Software Evolution and Software Maintenance, MSc
 - Szymon Gałecki - sgal@itu.dk
 
 ### Available services
-[Application](http://138.68.73.127:8000/)
-[API](http://138.68.73.127:8080/docs)
-[Monitoring](http://138.68.73.127:5003/login)
+[Application](http://138.68.73.127:8000/)  
+[API](http://138.68.73.127:8080/docs)  
+[Monitoring](http://138.68.73.127:5003/login)  
 [Logging](http://138.68.73.127:5000/app/dashboards#/view/a7d68a00-e5e5-11ed-9430-f1eb680f055e?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now)))
 
 
