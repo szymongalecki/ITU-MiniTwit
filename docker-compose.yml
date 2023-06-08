@@ -58,29 +58,29 @@ services:
   elasticsearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.17.1"
     environment:
-        - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-        - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "discovery.type=single-node"
     volumes:
-        - elk-elasticsearch-volume:/usr/share/elasticsearch/data
+      - elk-elasticsearch-volume:/usr/share/elasticsearch/data
     networks:
-        - elk
+      - elk
 
   kibana:
     image: "docker.elastic.co/kibana/kibana:7.17.1"
     environment:
-        elasticsearch.hosts: '["http://elasticsearch:9200"]'
+      elasticsearch.hosts: '["http://elasticsearch:9200"]'
     networks:
-        - elk
+      - elk
 
   filebeat:
     build: ./filebeat
     volumes:
-        - /var/lib/docker:/var/lib/docker:ro
-        - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
-        - elk
-          
-  nginx: 
+      - elk
+
+  nginx:
     build: ./nginx
     ports:
       - 9200:9200
@@ -89,24 +89,23 @@ services:
       - elk
 
   prometheus:
-    # built on apple sillicon, needs to be rebuild to run in droplet
     build: ./prometheus
     container_name: prometheus
     networks:
       - main
 
   grafana:
-    # correct architecture, runs in droplet, can be forked
     build: ./grafana
     container_name: grafana
     ports:
-      - "5003:3000"
+      - 5003:3000
     networks:
       - main
 
 volumes:
   postgres_volume:
   elk-elasticsearch-volume:
+
 
 networks:
   main:
