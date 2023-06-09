@@ -44,7 +44,6 @@ def public_timeline(request):
         user = User.objects.get(id=request.user.id)
     else:
         user = None
-    # messages = Message.objects.all().order_by('-pub_date')
     view = "public_timeline"
     messages = Message.objects.all().order_by('-pub_date')
     paginator = Paginator(messages, 10)  # 10 messages per page

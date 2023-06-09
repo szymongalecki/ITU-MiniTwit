@@ -1,5 +1,8 @@
 from django.test import TestCase
 from MiniTwit.forms import CustomUserCreationForm, CustomUserChangeForm
+import os
+
+test_password = os.environ.get("TEST_PASSWORD")
 
 class UserCreationFormTest(TestCase):
 
@@ -7,8 +10,8 @@ class UserCreationFormTest(TestCase):
         data = {
             'username': 'testuser',
             'email': 'testuser@gmail.com',
-            'password1': 'test123!',
-            'password2': 'test123!',
+            'password1': test_password,
+            'password2': test_password,
         }
 
         form = CustomUserCreationForm(data)
@@ -21,8 +24,8 @@ class UserChangeFormTest(TestCase):
         data = {
             'username': 'testuser',
             'email': 'testuser@gmail.com',
-            'password1': 'test123!',
-            'password2': 'test123!',
+            'password1': test_password,
+            'password2': test_password,
         }
 
         form = CustomUserChangeForm(data)

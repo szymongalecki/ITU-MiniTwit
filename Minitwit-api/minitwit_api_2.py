@@ -41,7 +41,7 @@ class User(BaseModel):
     pwd: str
 
 
-class Follow_Unfollow(BaseModel):
+class FollowUnfollow(BaseModel):
     follow: str | None = None
     unfollow: str | None = None
 
@@ -238,7 +238,7 @@ def post_user_messages(request: Request, username: str, message: Message, latest
 
 @app.post("/fllws/{username}", status_code=204)
 def post_follow_unfollow_user(
-    request: Request, username: str, f_u: Follow_Unfollow, latest: int = -1
+    request: Request, username: str, f_u: FollowUnfollow, latest: int = -1
 ) -> None:
     """Follows or unfollows user for another given user"""
     update_latest(latest)
