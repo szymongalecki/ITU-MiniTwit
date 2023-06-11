@@ -91,6 +91,8 @@ services:
   prometheus:
     build: ./prometheus
     container_name: prometheus
+    volumes:
+      - prometheus_volume:/prometheus
     networks:
       - main
 
@@ -105,6 +107,7 @@ services:
 volumes:
   postgres_volume:
   elk-elasticsearch-volume:
+  prometheus_volume:
 
 
 networks:
