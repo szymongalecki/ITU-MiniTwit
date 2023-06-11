@@ -92,9 +92,6 @@ jobs:
           file: ./Minitwit-api/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/apiminitwit:latest
-          env:
-            GRAFANA_USERNAME: ${{ secrets.GRAFANA_USERNAME }}
-            GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiminitwit:webbuildcacheapi,mode=max
 
@@ -105,6 +102,9 @@ jobs:
           file: ./grafana/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/grafana:latest
+          env:
+            GRAFANA_USERNAME: ${{ secrets.GRAFANA_USERNAME }}
+            GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi,mode=max
 
