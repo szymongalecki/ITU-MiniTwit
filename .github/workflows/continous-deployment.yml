@@ -104,6 +104,9 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/grafana:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/grafana:webbuildcacheapi,mode=max
+        env:
+          GRAFANA_USERNAME: ${{ secrets.GRAFANA_USERNAME }}
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
 
       - name: Build and push prometheus
         uses: docker/build-push-action@v2
